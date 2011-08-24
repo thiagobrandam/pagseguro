@@ -47,6 +47,7 @@ development: &development
   developer: true
   base: "http://localhost:3000"
   return_to: "/pedido/efetuado"
+  authenticity_token: 9CA8D46AF0C6177CB4C23D76CAF5E4B0
   email: user@example.com
 
 test:
@@ -64,7 +65,7 @@ Para o ambiente de produção, que irá efetivamente enviar os dados para o [Pag
 
 ### Montando o formulário
 
-Para montar o seu formulário, você deverá utilizar a classe `PagSeguro::Order`. Esta classe deverá ser instanciada recebendo um identificador único do pedido. Este identificador permitirá identificar o pedido quando o [PagSeguro](https://pagseguro.uol.com.br/?ind=689659) notificar seu site sobre uma alteração no status do pedido.
+Para montar o seu formulário, você deverá utilizar a classe `PagSeguro::Order`. Esta classe deverá ser instanciada recebendo uma referência, que deve ser única do pedido. Esta referência permitirá identificar o pedido quando o [PagSeguro](https://pagseguro.uol.com.br/?ind=689659) notificar seu site sobre uma alteração no status do pedido.
 
 ~~~.ruby
 class CartController < ApplicationController
@@ -78,9 +79,11 @@ class CartController < ApplicationController
 
     # adicionando os produtos do pedido ao objeto do formulario
     @invoice.products.each do |product|
-      # Estes sao os atributos necessarios. Por padrao, peso (:weight) eh definido para 0,
-      # quantidade eh definido como 1 e frete (:shipping) eh definido como 0.
-      @order.add :id => product.id, :price => product.price, :description => product.title
+      # Estes sao os atributos necessarios. Por padrao,
+      # quantidade (:quantity) eh definida como 1,
+      # peso (:weight) eh definido para 0 e
+      # frete (:shipping) eh definido como 0.
+      @order.add :id => product.id, :amount => product.price, :description => product.title
     end
   end
 end
@@ -89,27 +92,38 @@ end
 Se você precisar, pode definir o tipo de frete com o método `shipping_type`.
 
 ~~~.ruby
-@order.shipping_type = "SD" # Sedex
-@order.shipping_type = "EN" # PAC
-@order.shipping_type = "FR" # Frete Proprio
+@order.shipping_type = 1 # Encomenda normal (PAC)
+@order.shipping_type = 2 # SEDEX
+@order.shipping_type = 3 # Tipo de frete nao especificado
+~~~
+
+Se for utilizar o [redirecionamento para URL dinâmica](http://migre.me/5yfiG),
+pode definir a url de retorno com o método `redirect_url`.
+
+~~~.ruby
+@order.redirect_url = payment_confirmation_path
+@order.redirect_url = '/confirmation'
+@order.redirect_url = 'http://example.com.br/confirmation'
 ~~~
 
 Se você precisar, pode definir os dados de cobrança com o método `billing`.
 
 ~~~.ruby
 @order.billing = {
-  :name                  => "John Doe",
-  :email                 => "john@doe.com",
-  :address_zipcode       => "01234-567",
-  :address_street        => "Rua Orobo",
-  :address_number        => 72,
-  :address_complement    => "Casa do fundo",
-  :address_neighbourhood => "Tenorio",
-  :address_city          => "Pantano Grande",
-  :address_state         => "AC",
-  :address_country       => "Brasil",
-  :phone_area_code       => "22",
-  :phone_number          => "1234-5678"
+  :sender_name => 'John Doe',
+  :sender_email => 'john@doe.com',
+  :sender_area_code => 22,
+  :sender_phone => 12345678,
+  :shipping_address_country => 'BRA',
+  :shipping_address_state => 'AC',
+  :shipping_address_city => 'Pantano Grande',
+  :shipping_address_street => 'Rua Orobó',
+  :shipping_address_postal_code => 28050035,
+  :shipping_address_district => 'Tenório',
+  :shipping_address_number => 72,
+  :shipping_address_complement => 'Casa do fundo',
+  :extra_amount => -30.55,
+  :max_uses => 8,
 }
 ~~~
 
@@ -120,10 +134,10 @@ Depois que você definiu os produtos do pedido, você pode exibir o formulário.
 <%= pagseguro_form @order, :submit => "Efetuar pagamento!" %>
 ~~~
 
-Por padrão, o formulário é enviado para o email no arquivo de configuração. Você pode mudar o email com a opção `:email`.
+Por padrão, o formulário montado usando email e token do arquivo de configuração. Você pode alterar esse padrão com as opções `:email` e `:token`.
 
 ~~~.erb
-<%= pagseguro_form @order, :submit => "Efetuar pagamento!", :email => @account.email %>
+<%= pagseguro_form @order, :submit => "Efetuar pagamento!", :email => @account.email, :token => @account.token %>
 ~~~
 
 ### Recebendo notificações
@@ -258,3 +272,4 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

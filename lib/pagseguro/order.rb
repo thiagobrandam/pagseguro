@@ -2,18 +2,18 @@ module PagSeguro
   class Order
     # Map all billing attributes that will be added as form inputs.
     BILLING_MAPPING = {
-      :name                  => "cliente_nome",
-      :address_zipcode       => "cliente_cep",
-      :address_street        => "cliente_end",
-      :address_number        => "cliente_num",
-      :address_complement    => "cliente_compl",
-      :address_neighbourhood => "cliente_bairro",
-      :address_city          => "cliente_cidade",
-      :address_state         => "cliente_uf",
-      :address_country       => "cliente_pais",
-      :phone_area_code       => "cliente_ddd",
-      :phone_number          => "cliente_tel",
-      :email                 => "cliente_email"
+      :sender_name => 'senderName',
+      :sender_email => 'senderEmail',
+      :sender_area_code => 'senderAreaCode',
+      :sender_phone => 'senderPhone',
+      :shipping_address_country => 'shippingAddressCountry',
+      :shipping_address_state => 'shippingAddressState',
+      :shipping_address_city => 'shippingAddressCity',
+      :shipping_address_street => 'shippingAddressStreet',
+      :shipping_address_postal_code => 'shippingAddressPostalCode',
+      :shipping_address_district => 'shippingAddressDistrict',
+      :shipping_address_number => 'shippingAddressNumber',
+      :shipping_address_complement => 'shippingAddressComplement',
     }
 
     # The list of products added to the order
@@ -23,24 +23,45 @@ module PagSeguro
     attr_accessor :billing
 
     # Define the shipping type.
-    # Can be EN (PAC) or SD (Sedex)
+    # The allowed values are:
+    # - 1 (Normal order (PAC))
+    # - 2 (SEDEX)
+    # - 3 (Unspecified type of Shipping)
     attr_accessor :shipping_type
 
-    def initialize(order_id = nil)
+    # Define the redirect url for dynamic redirect.
+    # Reference: http://migre.me/5yfiG
+    attr_accessor :redirect_url
+
+    # Define the extra amount that should be added or subtracted from the total.
+    # Should be a decimal (positive or negative), with two decimal places.
+    attr_accessor :extra_amount
+
+    # Define the maximum number of times that the code created by the payment of
+    # Payments API call can be used.
+    # Should be a integer > 0.
+    attr_accessor :max_uses
+
+    # Define the time (in seconds) which the payment code created by the
+    # Payment API call can be used.
+    # Should be a integer >= 30.
+    attr_accessor :max_age
+
+    def initialize(order_reference = nil)
       reset!
-      self.id = order_id
+      self.reference = order_reference
       self.billing = {}
     end
 
-    # Set the order identifier. Should be a unique
+    # Set the order reference. Should be a unique
     # value to identify this order on your own application
-    def id=(identifier)
-      @id = identifier
+    def reference=(ref)
+      @reference = ref
     end
 
-    # Get the order identifier
-    def id
-      @id
+    # Get the order reference
+    def reference
+      @reference
     end
 
     # Remove all products from this order
@@ -50,32 +71,18 @@ module PagSeguro
 
     # Add a new product to the PagSeguro order
     # The allowed values are:
-    # - weight (Optional. If float, will be multiplied by 1000g)
-    # - shipping (Optional. If float, will be multiplied by 100 cents)
-    # - quantity (Optional. Defaults to 1)
-    # - price (Required. If float, will be multiplied by 100 cents)
-    # - description (Required. Identifies the product)
-    # - id (Required. Should match the product on your database)
-    # - fees (Optional. If float, will be multiplied by 100 cents)
+    # - id (Required. Text. Should match the product on your database)
+    # - description (Required. Text. Identifies the product)
+    # - quantity (Required. Integer >= 1 and <= 999. Defaults to 1)
+    # - amount (Required. Decimal, with two decimal places separated by a dot)
+    # - weight (Optional. Integer corresponding to the weight in grammes)
+    # - shipping (Optional. Decimal, with two decimal places separated by a dot)
     def <<(options)
       options = {
         :weight => nil,
         :shipping => nil,
-        :fees => nil,
         :quantity => 1
       }.merge(options)
-
-      # convert shipping to cents
-      options[:shipping] = convert_unit(options[:shipping], 100)
-
-      # convert fees to cents
-      options[:fees] = convert_unit(options[:fees], 100)
-
-      # convert price to cents
-      options[:price] = convert_unit(options[:price], 100)
-
-      # convert weight to grammes
-      options[:weight] = convert_unit(options[:weight], 1000)
 
       products.push(options)
     end
@@ -83,11 +90,6 @@ module PagSeguro
     def add(options)
       self << options
     end
-
-    private
-    def convert_unit(number, unit)
-      number = (BigDecimal("#{number}") * unit).to_i unless number.nil? || number.kind_of?(Integer)
-      number
-    end
   end
 end
+

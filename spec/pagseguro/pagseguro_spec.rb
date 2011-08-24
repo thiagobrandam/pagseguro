@@ -34,7 +34,7 @@ describe PagSeguro do
 
     it "should return real url if developer mode is disabled" do
       PagSeguro.should_receive(:developer?).and_return(false)
-      PagSeguro.gateway_url.should == "https://pagseguro.uol.com.br/checkout/checkout.jhtml"
+      PagSeguro.gateway_url.should == "https://ws.pagseguro.uol.com.br/v2/checkout"
     end
 
     it "should read configuration developer mode" do
@@ -46,3 +46,4 @@ describe PagSeguro do
     end
   end
 end
+
