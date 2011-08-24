@@ -110,20 +110,18 @@ Se você precisar, pode definir os dados de cobrança com o método `billing`.
 
 ~~~.ruby
 @order.billing = {
-  :sender_name => 'John Doe',
-  :sender_email => 'john@doe.com',
-  :sender_area_code => 22,
-  :sender_phone => 12345678,
-  :shipping_address_country => 'BRA',
-  :shipping_address_state => 'AC',
-  :shipping_address_city => 'Pantano Grande',
-  :shipping_address_street => 'Rua Orobó',
-  :shipping_address_postal_code => 28050035,
-  :shipping_address_district => 'Tenório',
-  :shipping_address_number => 72,
-  :shipping_address_complement => 'Casa do fundo',
-  :extra_amount => -30.55,
-  :max_uses => 8,
+  :name => 'John Doe',
+  :email => 'john@doe.com',
+  :phone_area_code => 22,
+  :phone_numer => 12345678,
+  :address_country => 'BRA',
+  :address_state => 'AC',
+  :address_city => 'Pantano Grande',
+  :address_street => 'Rua Orobó',
+  :address_postal_code => 28050035,
+  :address_district => 'Tenório',
+  :address_number => 72,
+  :address_complement => 'Casa do fundo',
 }
 ~~~
 

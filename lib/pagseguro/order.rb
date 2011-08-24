@@ -2,18 +2,18 @@ module PagSeguro
   class Order
     # Map all billing attributes that will be added as form inputs.
     BILLING_MAPPING = {
-      :sender_name => 'senderName',
-      :sender_email => 'senderEmail',
-      :sender_area_code => 'senderAreaCode',
-      :sender_phone => 'senderPhone',
-      :shipping_address_country => 'shippingAddressCountry',
-      :shipping_address_state => 'shippingAddressState',
-      :shipping_address_city => 'shippingAddressCity',
-      :shipping_address_street => 'shippingAddressStreet',
-      :shipping_address_postal_code => 'shippingAddressPostalCode',
-      :shipping_address_district => 'shippingAddressDistrict',
-      :shipping_address_number => 'shippingAddressNumber',
-      :shipping_address_complement => 'shippingAddressComplement',
+      :name => 'senderName',
+      :email => 'senderEmail',
+      :phone_area_code => 'senderAreaCode',
+      :phone_number => 'senderPhone',
+      :address_country => 'shippingAddressCountry',
+      :address_state => 'shippingAddressState',
+      :address_city => 'shippingAddressCity',
+      :address_street => 'shippingAddressStreet',
+      :address_postal_code => 'shippingAddressPostalCode',
+      :address_district => 'shippingAddressDistrict',
+      :address_number => 'shippingAddressNumber',
+      :address_complement => 'shippingAddressComplement',
     }
 
     # The list of products added to the order
