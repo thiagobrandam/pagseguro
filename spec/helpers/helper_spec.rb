@@ -33,8 +33,8 @@ describe PagSeguro::Helper do
   end
 
   it "should include extra amount" do
-    @order.extra_amount = -35.99
-    subject.should have_input(:name => "extraAmount", :value => "-35.99")
+    @order.extra_amount = -35.20
+    subject.should have_input(:name => "extraAmount", :value => "-35.20")
   end
 
   it "should include max uses" do
@@ -67,18 +67,18 @@ describe PagSeguro::Helper do
     it { should have_input(:name => "itemId1", :value => "1001") }
     it { should have_input(:name => "itemDescription1", :value => "Rails 3 e-Book") }
     it { should have_input(:name => "itemQuantity1", :value => "1") }
-    it { should have_input(:name => "itemAmount1", :value => "10.0") }
+    it { should have_input(:name => "itemAmount1", :value => "10.00") }
     it { should_not have_input(:name => "itemShippingCost1") }
     it { should_not have_input(:name => "itemWeight1") }
   end
 
   context "with optional product info" do
     before do
-      @order << { :id => 1001, :amount => 10.00, :description => "T-Shirt", :weight => 300, :shipping => 8.55, :quantity => 2 }
+      @order << { :id => 1001, :amount => 10.00, :description => "T-Shirt", :weight => 300, :shipping => 8.50, :quantity => 2 }
     end
 
     it { should have_input(:name => "itemQuantity1", :value => "2") }
-    it { should have_input(:name => "itemShippingCost1", :value => "8.55") }
+    it { should have_input(:name => "itemShippingCost1", :value => "8.50") }
     it { should have_input(:name => "itemWeight1", :value => "300") }
   end
 
@@ -91,12 +91,12 @@ describe PagSeguro::Helper do
     it { should have_input(:name => "itemId1", :value => "1001") }
     it { should have_input(:name => "itemDescription1", :value => "Rails 3 e-Book") }
     it { should have_input(:name => "itemQuantity1", :value => "1") }
-    it { should have_input(:name => "itemAmount1", :value => "10.0") }
+    it { should have_input(:name => "itemAmount1", :value => "10.00") }
 
     it { should have_input(:name => "itemId2", :value => "1002") }
     it { should have_input(:name => "itemDescription2", :value => "Rails 3 e-Book + Screencast") }
     it { should have_input(:name => "itemQuantity2", :value => "1") }
-    it { should have_input(:name => "itemAmount2", :value => "19.3") }
+    it { should have_input(:name => "itemAmount2", :value => "19.30") }
   end
 
   context "with billing info" do

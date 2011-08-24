@@ -8,7 +8,7 @@
 
 		<%= hidden_field_tag "shippingType", order.shipping_type if order.shipping_type %>
 		<%= hidden_field_tag "redirectURL", order.redirect_url if order.redirect_url %>
-		<%= hidden_field_tag "extraAmount", order.extra_amount if order.extra_amount %>
+		<%= hidden_field_tag "extraAmount", "%.2f" % order.extra_amount if order.extra_amount %>
 		<%= hidden_field_tag "maxUses", order.max_uses if order.max_uses %>
 		<%= hidden_field_tag "maxAge", order.max_age if order.max_age %>
 
@@ -16,9 +16,9 @@
 			<% i += 1 %>
 			<%= hidden_field_tag "itemId#{i}", product[:id] %>
 			<%= hidden_field_tag "itemDescription#{i}", product[:description] %>
-			<%= hidden_field_tag "itemAmount#{i}", product[:amount] %>
+			<%= hidden_field_tag "itemAmount#{i}", "%.2f" % product[:amount] %>
 			<%= hidden_field_tag "itemQuantity#{i}", product[:quantity] %>
-			<%= hidden_field_tag "itemShippingCost#{i}", product[:shipping] if product[:shipping] %>
+			<%= hidden_field_tag "itemShippingCost#{i}", "%.2f" % product[:shipping] if product[:shipping] %>
 			<%= hidden_field_tag "itemWeight#{i}", product[:weight] if product[:shipping] %>
 		<% end %>
 
