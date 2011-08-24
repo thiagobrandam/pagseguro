@@ -61,7 +61,7 @@ describe PagSeguro::Helper do
 
   context "with minimum product info" do
     before do
-      @order << { :reference => 1001, :amount => 10.00, :description => "Rails 3 e-Book" }
+      @order << { :id => 1001, :amount => 10.00, :description => "Rails 3 e-Book" }
     end
 
     it { should have_input(:name => "itemId1", :value => "1001") }
@@ -74,7 +74,7 @@ describe PagSeguro::Helper do
 
   context "with optional product info" do
     before do
-      @order << { :reference => 1001, :amount => 10.00, :description => "T-Shirt", :weight => 300, :shipping => 8.55, :quantity => 2 }
+      @order << { :id => 1001, :amount => 10.00, :description => "T-Shirt", :weight => 300, :shipping => 8.55, :quantity => 2 }
     end
 
     it { should have_input(:name => "itemQuantity1", :value => "2") }
@@ -84,8 +84,8 @@ describe PagSeguro::Helper do
 
   context "with multiple products" do
     before do
-      @order << { :reference => 1001, :amount => 10.00, :description => "Rails 3 e-Book" }
-      @order << { :reference => 1002, :amount => 19.30, :description => "Rails 3 e-Book + Screencast" }
+      @order << { :id => 1001, :amount => 10.00, :description => "Rails 3 e-Book" }
+      @order << { :id => 1002, :amount => 19.30, :description => "Rails 3 e-Book + Screencast" }
     end
 
     it { should have_input(:name => "itemId1", :value => "1001") }
@@ -102,18 +102,18 @@ describe PagSeguro::Helper do
   context "with billing info" do
     before do
       @order.billing = {
-	      :sender_name => 'John Doe',
-	      :sender_email => 'john@doe.com',
-	      :sender_area_code => 22,
-	      :sender_phone => 12345678,
-	      :shipping_address_country => 'BRA',
-	      :shipping_address_state => 'AC',
-	      :shipping_address_city => 'Pantano Grande',
-	      :shipping_address_street => 'Rua Orobó',
-	      :shipping_address_postal_code => 28050035,
-	      :shipping_address_district => 'Tenório',
-	      :shipping_address_number => 72,
-	      :shipping_address_complement => 'Casa do fundo',
+	      :name => 'John Doe',
+	      :email => 'john@doe.com',
+	      :phone_area_code => 22,
+	      :phone_number => 12345678,
+	      :address_country => 'BRA',
+	      :address_state => 'AC',
+	      :address_city => 'Pantano Grande',
+	      :address_street => 'Rua Orobó',
+	      :address_postal_code => 28050035,
+	      :address_district => 'Tenório',
+	      :address_number => 72,
+	      :address_complement => 'Casa do fundo',
       }
     end
 
