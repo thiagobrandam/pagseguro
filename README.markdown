@@ -106,6 +106,29 @@ pode definir a url de retorno com o método `redirect_url`.
 @order.redirect_url = 'http://example.com.br/confirmation'
 ~~~
 
+Se você precisar, pode definir uma taxa extra ou desconto com o método `extra_amount`.
+
+~~~.ruby
+@order.extra_amount = 30.50 # Taxa extra
+@order.extra_amount = -19.85 # Desconto
+~~~
+
+Se você precisar, pode definir o número máximo de vezes que o código de
+pagamento criado pela chamada à API de Pagamentos poderá ser usado. Isso pode
+ser feito com o método `max_uses` que deve receber um inteiro maior que 0.
+
+~~~.ruby
+@order.max_uses = 8
+~~~
+
+Se você precisar, pode definir o prazo (em segundos) durante o qual o código de
+pagamento criado pela chamada à API de Pagamentos poderá ser usado. Isso pode
+ser feito com o método `max_age` que deve receber um inteiro maior ou igual a 30.
+
+~~~.ruby
+@order.max_age = 60
+~~~
+
 Se você precisar, pode definir os dados de cobrança com o método `billing`.
 
 ~~~.ruby
