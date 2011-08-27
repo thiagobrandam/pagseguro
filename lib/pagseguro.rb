@@ -2,6 +2,7 @@ require "net/https"
 require "uri"
 require "time"
 require "bigdecimal"
+require "httparty"
 
 require "pagseguro/base"
 require "pagseguro/faker"
@@ -12,3 +13,4 @@ require "pagseguro/order"
 require "pagseguro/action_controller"
 require "pagseguro/helper"
 require "pagseguro/utils"
+
