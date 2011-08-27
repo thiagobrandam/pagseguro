@@ -5,13 +5,6 @@ require "spec_helper"
 describe PagSeguro::ActionController do
   include PagSeguro::ActionController
 
-  def stub_post(params={}, not_params={})
-    HTTParty.should_receive(:post).
-      with(PagSeguro.gateway_url,
-        hash_including(:body => @default_params.merge(params))).
-          and_return(stub(:parsed_response => @response))
-  end
-
   before do
     @order = PagSeguro::Order.new('I1001')
     PagSeguro.stub(:gateway_url) {'http://localhost:3000'}
@@ -23,29 +16,47 @@ describe PagSeguro::ActionController do
                                  'date' => '2010-12-02T10:11:28.000-02:00' } }
   end
 
+  def stub_post(params={})
+    HTTParty.should_receive(:post).
+      with(PagSeguro.gateway_url,
+        hash_including(:body => @default_params.merge(params))).
+          and_return(stub(:parsed_response => @response))
+  end
+
+  # TODO: This could be a route
   it "should return the payment url with given code" do
     code = '9CA8D46AF0C6177CB4C23D76CAF5E4B0'
     pagseguro_payment_path(code).should == PagSeguro.gateway_url + "/payment.html?code=#{code}"
   end
 
+  context 'PagSeguro post with errors' do
+    it 'should return a hash with errors code and message' do
+      @response = { 'errors' => { 'error' => { 'code' => '11004', 'message' => 'Currency is required.' },
+                                  'error' => { 'code' => '11005', 'message' => 'Currency invalid value: 100' } }}
 
-  context 'PagSeguro post' do
+      stub_post
+      hash = { :error => { :code => '11004', :message => 'Currency is required.' },
+               :error => { :code => '11005', :message => 'Currency invalid value: 100' } }
+      pagseguro_post(@order).should == hash
+    end
+  end
+
+  context 'PagSeguro post successfully' do
+    it 'should return a hash with code and date' do
+      hash = { :code => '9CA8D46AF0C6177CB4C23D76CAF5E4B0',
+               :date => '2010-12-02T10:11:28.000-02:00'.to_datetime }
+      stub_post
+      pagseguro_post(@order).should == hash
+    end
+
     context "should accept with custom option" do
       it 'email' do
         stub_post :email => 'mary@example.com'
-#        body = @default_params.merge('email' => 'mary@example.com')
-#        HTTParty.should_receive(:post).
-#          with(PagSeguro.gateway_url, hash_including(:body => body)).
-#            and_return(stub(:parsed_response => @response))
         pagseguro_post(@order, :email => 'mary@example.com')
       end
 
       it 'token' do
         stub_post :token => '5BD8D46AC1C6177AA5C23D76CAF6A5F2'
-#        body = @default_params.merge('token' => '5BD8D46AC1C6177AA5C23D76CAF6A5F2')
-#        HTTParty.should_receive(:post).
-#          with(PagSeguro.gateway_url, hash_including(:body => body)).
-#            and_return(stub(:parsed_response => @response))
         pagseguro_post(@order, :token => '5BD8D46AC1C6177AA5C23D76CAF6A5F2')
       end
     end

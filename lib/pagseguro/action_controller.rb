@@ -48,9 +48,13 @@ module PagSeguro
 
       post_options = { :body => params, :headers => header }
 	    response = HTTParty.post(PagSeguro.gateway_url, post_options)
-	    code = response.parsed_response['checkout']['code']
-	    date = response.parsed_response['checkout']['date'].to_datetime
-      return { :code => code, :date => date }
+	    hash = response.parsed_response.recursive_symbolize_keys
+	    if hash[:checkout]
+  	    hash[:checkout][:date] = hash[:checkout][:date].to_datetime
+        return hash[:checkout]
+      else
+        return hash[:errors]
+      end
     end
   end
 end
