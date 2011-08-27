@@ -1,6 +1,8 @@
 module PagSeguro::Helper
-  def pagseguro_form(order, options = {})
-    options.reverse_merge!(:submit => "Pagar com PagSeguro")
-    render :partial => "/pagseguro_form", :locals => {:options => options, :order => order}
+  def pagseguro_form(path, options={})
+    options.reverse_merge!(:submit => 'Pagar com PagSeguro', :params => {})
+    render :partial => "/pagseguro_form",
+           :locals => {:path => path, :options => options}
   end
 end
+
