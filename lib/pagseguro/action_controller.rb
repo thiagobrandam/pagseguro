@@ -9,7 +9,7 @@ module PagSeguro
     end
 
     def pagseguro_payment_path(code)
-      PagSeguro.gateway_url + "/payment.html?code=#{code}"
+      PagSeguro.gateway_url + "?code=#{code}"
     end
 
     def pagseguro_post(order, options={})

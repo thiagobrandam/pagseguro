@@ -22,5 +22,9 @@ module PagSeguro
       # redirect to the configuration url
       redirect_to PagSeguro.config["return_to"]
     end
+
+    def payment
+    end
   end
 end
+

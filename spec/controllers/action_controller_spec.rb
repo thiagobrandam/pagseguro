@@ -23,10 +23,10 @@ describe PagSeguro::ActionController do
           and_return(stub(:parsed_response => @response))
   end
 
-  # TODO: This could be a route
   it "should return the payment url with given code" do
+    PagSeguro.stub(:gateway_url) {'/pagseguro_payment'}
     code = '9CA8D46AF0C6177CB4C23D76CAF5E4B0'
-    pagseguro_payment_path(code).should == PagSeguro.gateway_url + "/payment.html?code=#{code}"
+    pagseguro_payment_path(code).should == PagSeguro.gateway_payment_url + "?code=#{code}"
   end
 
   context 'PagSeguro post with errors' do
