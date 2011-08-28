@@ -15,7 +15,7 @@ module PagSeguro::Helper
     image_default_options = '205x30-pagar'
 
     image = options[:image]
-    if image and image.class == 'Hash'
+    if image and image.class == Hash
       image_options = []
       image_options << image[:size] ? image[:size] : '205x30'
       image_options << image[:text] ? image[:text].to_s : 'pagar'
@@ -23,7 +23,7 @@ module PagSeguro::Helper
         image_options << image[:color].to_s
       end
       options[:image] = image_base_url + image_options.join('-') + image_extention
-    elsif image.nil? or image.class != 'String'
+    elsif image.nil? or image.class != String
       options[:image] = image_base_url + image_default_options + image_extention
     end
     render :partial => "/pagseguro_default_form", :locals => {:options => options, :order => order}

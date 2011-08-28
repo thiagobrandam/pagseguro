@@ -5,6 +5,7 @@ RSpec::Matchers.define :have_input do |options|
     selector = "input"
     selector << "[type=#{options[:type]}]"
     selector << "[name=#{options[:name]}]" if options[:name]
+    selector << "[src='#{options[:src]}']" if options[:src]
 
     input = html.css(selector).first
 
@@ -37,3 +38,4 @@ RSpec::Matchers.define :have_attr do |name, value|
     "should have attribute #{name.inspect} with value #{value.inspect}"
   end
 end
+

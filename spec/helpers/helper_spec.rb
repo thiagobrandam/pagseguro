@@ -26,7 +26,6 @@ describe PagSeguro::Helper do
         page = Nokogiri::HTML(helper.pagseguro_default_form(@order, :image => {:size => "94x45",
                                                                     :color => :azul,
                                                                     :text => :comprar})).css("form").first
-
         page.should have_input(:name => "submit",
                                :type => "image",
                                :src => "https://p.simg.uol.com.br/out/pagseguro/i/botoes/pagamentos/94x45-comprar-azul.gif")
