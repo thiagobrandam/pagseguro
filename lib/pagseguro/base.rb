@@ -1,5 +1,17 @@
+# -*- encoding : utf-8 -*-
+
 module PagSeguro
   extend self
+
+  STATUS = {
+    1 => 'Aguardando pagamento',
+    2	=> 'Em análise',
+    3	=> 'Paga',
+    4 => 'Disponível',
+    5 => 'Em disputa',
+    6 => 'Devolvida',
+    7 => 'Cancelada'
+  }
 
   # PagSeguro receives all invoices in this URL. If developer mode is enabled,
   # then the URL will be /pagseguro_developer/invoice

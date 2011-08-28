@@ -1,0 +1,28 @@
+<form action="<%= PagSeguro.gateway_payment_url %>" class="pagseguro", method="post">
+	<div>
+		<%= hidden_field_tag "receiverEmail", options.fetch(:email, PagSeguro.config["email"])  %>
+		<%= hidden_field_tag "currency", "BRL" %>
+		<%= hidden_field_tag "charset", "UTF-8"  %>
+
+		<%= hidden_field_tag "reference", order.reference %>
+		<%= hidden_field_tag "extraAmount", "%.2f" % order.extra_amount if order.extra_amount %>
+
+		<% order.products.each_with_index do |product, i| %>
+			<% i += 1 %>
+			<%= hidden_field_tag "itemId#{i}", product[:id] %>
+			<%= hidden_field_tag "itemDescription#{i}", product[:description] %>
+			<%= hidden_field_tag "itemAmount#{i}", "%.2f" % product[:amount] %>
+			<%= hidden_field_tag "itemQuantity#{i}", product[:quantity] %>
+			<%= hidden_field_tag "itemShippingCost#{i}", "%.2f" % product[:shipping] if product[:shipping] %>
+			<%= hidden_field_tag "itemWeight#{i}", product[:weight] if product[:shipping] %>
+		<% end %>
+
+		<%= hidden_field_tag "shippingType", order.shipping_type if order.shipping_type %>
+		<% order.billing.each do |name, value| %>
+			<%= hidden_field_tag PagSeguro::Order::BILLING_MAPPING[name.to_sym], value %>
+		<% end %>
+
+    <input type="image" name="submit" src="<%= options[:image] %>" alt="Pague com PagSeguro">
+	</div>
+</form>
+

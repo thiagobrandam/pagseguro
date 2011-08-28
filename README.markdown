@@ -98,11 +98,13 @@ Se você precisar, pode definir o tipo de frete com o método `shipping_type`.
 ~~~
 
 Se for utilizar o [redirecionamento para URL dinâmica](http://migre.me/5yfiG),
-pode definir a url de retorno com o método `redirect_url`.
+pode definir a url de retorno com o método `redirect_url` que deve receber a url
+completa.
 
 ~~~.ruby
-@order.redirect_url = payment_confirmation_path
-@order.redirect_url = '/confirmation'
+# Lembre-se que para rotas apelidadas, o complemento '_path' retorna
+# a url relativa. Para ter a url completa, use o complemento '_url'.
+@order.redirect_url = payment_confirmation_url
 @order.redirect_url = 'http://example.com.br/confirmation'
 ~~~
 
@@ -147,6 +149,10 @@ Se você precisar, pode definir os dados de cobrança com o método `billing`.
   :address_complement => 'Casa do fundo',
 }
 ~~~
+
+**Obs.:** Caso defina os dados de cobrança, a definição do tipo de frete
+torna-se obrigatória e pode ser feita, como dito anteriormente, através do
+método `shipping_type`.
 
 Depois que você definiu os produtos do pedido, você pode exibir o formulário.
 
