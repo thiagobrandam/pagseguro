@@ -1,4 +1,4 @@
-<form action="<%= PagSeguro.gateway_payment_url %>" class="pagseguro", method="post">
+<%= form_tag(PagSeguro.gateway_payment_url, :class => :pagseguro) do %>
 	<div>
 		<%= hidden_field_tag "receiverEmail", options.fetch(:email, PagSeguro.config["email"])  %>
 		<%= hidden_field_tag "currency", "BRL" %>
@@ -24,5 +24,5 @@
 
     <input type="image" name="submit" src="<%= options[:image] %>" alt="Pague com PagSeguro">
 	</div>
-</form>
+<% end %>
 
