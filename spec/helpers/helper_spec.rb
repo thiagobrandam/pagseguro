@@ -42,6 +42,7 @@ describe PagSeguro::Helper do
 
     context "with default attributes" do
       it { should have_attr("action", PagSeguro::GATEWAY_PAYMENT_URL) }
+      it { should have_attr("target", "pagseguro") }
       it { should have_attr("class", "pagseguro") }
       it { should have_input(:name => "charset", :value => "UTF-8") }
       it { should have_input(:name => "receiverEmail", :value => "john@doe.com") }
