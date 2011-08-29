@@ -29,7 +29,7 @@ describe PagSeguro do
 
     it "should return local url if developer mode is enabled" do
       PagSeguro.should_receive(:developer?).and_return(true)
-      PagSeguro.gateway_url.should == "/pagseguro_developer"
+      PagSeguro.gateway_url.should == "http://localhost:3000/pagseguro_developer"
     end
 
     it "should return real url if developer mode is disabled" do

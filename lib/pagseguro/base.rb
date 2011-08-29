@@ -40,7 +40,7 @@ module PagSeguro
   # app is running in developer mode
   def gateway_url
     if developer?
-      "/pagseguro_developer"
+      PagSeguro.config['base'] + '/pagseguro_developer'
     else
       GATEWAY_URL
     end
@@ -50,7 +50,7 @@ module PagSeguro
   # app is running in developer mode
   def gateway_payment_url
     if developer?
-      "/pagseguro_payment"
+      PagSeguro.config['base'] + '/pagseguro_developer_payment'
     else
       GATEWAY_PAYMENT_URL
     end

@@ -29,14 +29,21 @@ describe PagSeguro::ActionController do
     pagseguro_payment_path(code).should == PagSeguro.gateway_payment_url + "?code=#{code}"
   end
 
-  context 'PagSeguro post with errors' do
-    it 'should return a hash with errors code and message' do
+  context 'PagSeguro post with errors should return a hash with errors code and message' do
+    it 'pagseguro default errors' do
       @response = { 'errors' => { 'error' => { 'code' => '11004', 'message' => 'Currency is required.' },
                                   'error' => { 'code' => '11005', 'message' => 'Currency invalid value: 100' } }}
 
       stub_post
       hash = { :error => { :code => '11004', :message => 'Currency is required.' },
                :error => { :code => '11005', :message => 'Currency invalid value: 100' } }
+      pagseguro_post(@order).should == hash
+    end
+
+    it 'http 401 Unauthorized error' do
+      @response = 'Unauthorized'
+      stub_post
+      hash = { :error => { :code => 'HTTP 401', :message => 'Unauthorized' } }
       pagseguro_post(@order).should == hash
     end
   end

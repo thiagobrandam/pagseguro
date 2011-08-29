@@ -14,13 +14,15 @@ describe PagSeguro::DeveloperController do
   end
 
   it "should save sent params" do
-    post :create, :email_cobranca => "john@doe.com", :ref_transacao => "I1001"
-    orders["I1001"]["email_cobranca"].should == "john@doe.com"
-    orders["I1001"]["ref_transacao"].should == "I1001"
+    post :create, :email => "mary@anne.com", :reference => "I1001"
+    orders["I1001"]["email"].should == "mary@anne.com"
+    orders["I1001"]["reference"].should == "I1001"
   end
 
   it "should redirect to the return url" do
+    pending
     post :create, :ref_transacao => "I1001"
     response.should redirect_to("/invoices/confirmation")
   end
 end
+
