@@ -33,6 +33,12 @@ module PagSeguro
     # Reference: http://migre.me/5yfiG
     attr_accessor :redirect_url
 
+    # Define the token. The default is the one on config/pagseguro.yml
+    attr_accessor :token
+
+    # Define the email. The default is the one on config/pagseguro.yml
+    attr_accessor :email
+
     # Define the extra amount that should be added or subtracted from the total.
     # Should be a decimal (positive or negative), with two decimal places.
     attr_accessor :extra_amount

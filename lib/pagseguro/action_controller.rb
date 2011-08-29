@@ -12,13 +12,13 @@ module PagSeguro
       PagSeguro.gateway_payment_url + "?code=#{code}"
     end
 
-    def pagseguro_post(order, options={})
+    def pagseguro_post(order)
       header = { 'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8' }
 
       # Add required params
       params = {
-	      :email => options.fetch(:email, PagSeguro.config['email']),
-	      :token => options.fetch(:token, PagSeguro.config['authenticity_token']),
+	      :email => (order.email ? order.email : PagSeguro.config['email']),
+	      :token => (order.token ? order.token : PagSeguro.config['authenticity_token']),
 	      :currency => 'BRL',
 	      :reference => order.reference
       }

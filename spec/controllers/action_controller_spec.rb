@@ -56,21 +56,33 @@ describe PagSeguro::ActionController do
       pagseguro_post(@order).should == hash
     end
 
-    context "should accept with custom option" do
+    context 'with default options' do
+      after(:each) do
+        pagseguro_post(@order)
+      end
+
       it 'email' do
-        stub_post :email => 'mary@example.com'
-        pagseguro_post(@order, :email => 'mary@example.com')
+        stub_post :email => 'john@doe.com'
       end
 
       it 'token' do
-        stub_post :token => '5BD8D46AC1C6177AA5C23D76CAF6A5F2'
-        pagseguro_post(@order, :token => '5BD8D46AC1C6177AA5C23D76CAF6A5F2')
+        stub_post :token => '9CA8D46AF0C6177CB4C23D76CAF5E4B0'
       end
     end
 
-    context 'without without options' do
+    context 'with custom options' do
       after(:each) do
         pagseguro_post(@order)
+      end
+
+      it 'email' do
+        @order.email = 'mary@example.com'
+        stub_post :email => 'mary@example.com'
+      end
+
+      it 'token' do
+        @order.token = '5BD8D46AC1C6177AA5C23D76CAF6A5F2'
+        stub_post :token => '5BD8D46AC1C6177AA5C23D76CAF6A5F2'
       end
 
       it "should include shipping type" do

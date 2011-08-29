@@ -16,6 +16,41 @@ describe PagSeguro::Order do
     @order.reference.should == "ABCDEF"
   end
 
+  it "should set order email throught setter" do
+    @order.email = "john@doe.com"
+    @order.email.should == "john@doe.com"
+  end
+
+  it "should set order token throught setter" do
+    @order.token = "ABCDEF342432243AHI2"
+    @order.token.should == "ABCDEF342432243AHI2"
+  end
+
+  it "should set order shipping type throught setter" do
+    @order.shipping_type = 1
+    @order.shipping_type.should == 1
+  end
+
+  it "should set order redirect url throught setter" do
+    @order.redirect_url = 'http://example.com.br/confirmation'
+    @order.redirect_url.should == 'http://example.com.br/confirmation'
+  end
+
+  it "should set order extra amount throught setter" do
+    @order.extra_amount = -35.20
+    @order.extra_amount.should == -35.20
+  end
+
+  it "should set order max uses throught setter" do
+    @order.max_uses = 8
+    @order.max_uses.should == 8
+  end
+
+  it "should set order max age throught setter" do
+    @order.max_age = 60
+    @order.max_age.should == 60
+  end
+
   it "should reset products" do
     @order.products += [1,2,3]
     @order.products.should have(3).items
