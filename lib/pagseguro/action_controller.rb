@@ -55,7 +55,9 @@ module PagSeguro
   	    hash[:checkout][:date] = hash[:checkout][:date].to_datetime
         return hash[:checkout]
       else
-        return hash[:errors]
+        errors = hash[:errors][:error]
+        hash[:errors] = (errors.class == Hash) ? [errors] : errors
+        return hash
       end
     end
   end

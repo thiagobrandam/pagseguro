@@ -30,13 +30,21 @@ describe PagSeguro::ActionController do
   end
 
   context 'PagSeguro post with errors should return a hash with errors code and message' do
-    it 'pagseguro default errors' do
-      @response = { 'errors' => { 'error' => { 'code' => '11004', 'message' => 'Currency is required.' },
-                                  'error' => { 'code' => '11005', 'message' => 'Currency invalid value: 100' } }}
+    it 'pagseguro uniq default error' do
+      @response = { 'errors' => { 'error' => { 'code' => '11004', 'message' => 'Currency is required.' } } }
 
       stub_post
-      hash = { :error => { :code => '11004', :message => 'Currency is required.' },
-               :error => { :code => '11005', :message => 'Currency invalid value: 100' } }
+      hash = { :errors => [{ :code => '11004', :message => 'Currency is required.' }] }
+      pagseguro_post(@order).should == hash
+    end
+
+    it 'pagseguro multiple default errors' do
+      @response = { 'errors' => { 'error' =>  [{ 'code' => '11004', 'message' => 'Currency is required.' },
+                                               { 'code' => '11005', 'message' => 'Currency invalid value: 100' }]}}
+
+      stub_post
+      hash = { :errors => [{ :code => '11004', :message => 'Currency is required.' },
+                           { :code => '11005', :message => 'Currency invalid value: 100' }] }
       pagseguro_post(@order).should == hash
     end
 

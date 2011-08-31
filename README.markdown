@@ -61,14 +61,15 @@ production:
 
 Esta gem possui um modo de desenvolvimento que permite simular a realização de pedidos e envio de notificações; basta utilizar a opção `developer`. Ela é ativada por padrão nos ambientes de desenvolvimento e teste. Você deve configurar as opções `base`, que deverá apontar para o seu servidor e a URL de retorno, que deverá ser configurada no próprio [PagSeguro](https://pagseguro.uol.com.br/?ind=689659), na página <https://pagseguro.uol.com.br/Security/ConfiguracoesWeb/RetornoAutomatico.aspx>.
 
-Para o ambiente de produção, que irá efetivamente enviar os dados para o [PagSeguro](https://pagseguro.uol.com.br/?ind=689659), você precisará adicionar o e-mail cadastrado como vendedor e o `authenticity_token`, que é o Token para Conferência de Segurança, que pode ser conseguido na página <https://pagseguro.uol.com.br/Security/ConfiguracoesWeb/RetornoAutomatico.aspx>.
+Para o ambiente de produção, que irá efetivamente enviar os dados para o [PagSeguro](https://pagseguro.uol.com.br/?ind=689659), você precisará adicionar o e-mail cadastrado como vendedor e o `authenticity_token`, que é o Token para Conferência de Segurança, que pode ser conseguido na página <https://pagseguro.uol.com.br/integracao/token-de-seguranca.jhtml>.
 
-### Montando o formulário
+### Enviando pagamentos
 
-Para montar o seu formulário, você deverá utilizar a classe `PagSeguro::Order`. Esta classe deverá ser instanciada recebendo uma referência, que deve ser única do pedido. Esta referência permitirá identificar o pedido quando o [PagSeguro](https://pagseguro.uol.com.br/?ind=689659) notificar seu site sobre uma alteração no status do pedido.
+Para montar seu _pedido_, que será pago com o pagseguro, você deverá utilizar a classe `PagSeguro::Order`. Esta classe deverá ser instanciada recebendo uma referência, que deve ser única do pedido. Esta referência permitirá identificar o pedido quando o [PagSeguro](https://pagseguro.uol.com.br/?ind=689659) notificar seu site sobre uma alteração no status do pedido.
 
 ~~~.ruby
 class CartController < ApplicationController
+
   def checkout
     # Busca o pedido associado ao usuario; esta logica deve
     # ser implementada por voce, da maneira que achar melhor
