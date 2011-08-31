@@ -51,7 +51,7 @@ describe PagSeguro::ActionController do
     it 'http 401 Unauthorized error' do
       @response = 'Unauthorized'
       stub_post
-      hash = { :error => { :code => 'HTTP 401', :message => 'Unauthorized' } }
+      hash = { :errors => [{ :code => 'HTTP 401', :message => 'Unauthorized' }] }
       pagseguro_post(@order).should == hash
     end
   end

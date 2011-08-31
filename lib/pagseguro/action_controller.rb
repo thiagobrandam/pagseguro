@@ -49,7 +49,7 @@ module PagSeguro
       post_options = { :body => params, :headers => header }
 	    response = HTTParty.post(PagSeguro.gateway_url, post_options).parsed_response
 
-	    return :error => {:code => 'HTTP 401', :message => 'Unauthorized'} if response == 'Unauthorized'
+	    return :errors => [{:code => 'HTTP 401', :message => 'Unauthorized'}] if response == 'Unauthorized'
 	    hash = response.recursive_symbolize_keys
 	    if hash[:checkout]
   	    hash[:checkout][:date] = hash[:checkout][:date].to_datetime
