@@ -5,6 +5,7 @@ module PagSeguro
   # then the URL will be /pagseguro_developer/invoice
   GATEWAY_URL = "https://ws.pagseguro.uol.com.br/v2/checkout"
   GATEWAY_PAYMENT_URL = "https://pagseguro.uol.com.br/v2/checkout/payment.html"
+  GATEWAY_NOTIFICATION_URL = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications"
 
   # Hold the config/pagseguro.yml contents
   @@config = nil
@@ -53,6 +54,16 @@ module PagSeguro
       PagSeguro.config['base'] + '/pagseguro_developer_payment'
     else
       GATEWAY_PAYMENT_URL
+    end
+  end
+
+  # The gateway URL will point to a local URL is
+  # app is running in developer mode
+  def gateway_notification_url
+    if developer?
+      PagSeguro.config['base'] + '/pagseguro_developer_notification'
+    else
+      GATEWAY_NOTIFICATION_URL
     end
   end
 

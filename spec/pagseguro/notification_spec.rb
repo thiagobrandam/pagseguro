@@ -1,340 +1,413 @@
 # encoding: utf-8
-require "spec_helper"
+require 'spec_helper'
 
 describe PagSeguro::Notification do
   subject { PagSeguro::Notification.new(@the_params) }
-  let(:payload) { YAML.load_file File.dirname(__FILE__) + "/../fixtures/notification.yml" }
+  let(:payload) { YAML.load_file File.dirname(__FILE__) + '/../fixtures/notification.yml' }
   before { @the_params = {} }
 
-  it "should not request the confirmation url when running developer mode" do
-    PagSeguro.stub :developer? => true
-    Net::HTTP.should_not_receive(:new)
-    subject.should be_valid
-  end
-
-  describe "#to_hash" do
-    subject { PagSeguro::Notification.new(payload) }
-
-    PagSeguro::Notification::MAPPING.each do |name, value|
-      it "includes #{name}" do
-        subject.to_hash.should have_key(name)
-        subject.to_hash[name].should_not be_nil
-      end
-    end
-  end
-
-  describe "status mapping" do
-    it "should be completed" do
-      set_status!("Completo")
-      subject.status.should == :completed
-    end
-
-    it "should be pending" do
-      set_status!("Aguardando Pagto")
+  describe 'status mapping' do
+    it 'should be pending' do
+      param!(:status, '1')
       subject.status.should == :pending
+      subject.status_name.should == 'Aguardando pagamento'
     end
 
-    it "should be approved" do
-      set_status!("Aprovado")
-      subject.status.should == :approved
-    end
-
-    it "should be verifying" do
-      set_status!("Em Análise")
+    it 'should be verifying' do
+      param!(:status, '2')
       subject.status.should == :verifying
+      subject.status_name.should == 'Em análise'
     end
 
-    it "should be canceled" do
-      set_status!("Cancelado")
-      subject.status.should == :canceled
+    it 'should be paid' do
+      param!(:status, '3')
+      subject.status.should == :paid
+      subject.status_name.should == 'Paga'
     end
 
-    it "should be refunded" do
-      set_status!("Devolvido")
+    it 'should be available' do
+      param!(:status, '4')
+      subject.status.should == :available
+      subject.status_name.should == 'Disponível'
+    end
+
+    it 'should be dispute' do
+      param!(:status, '5')
+      subject.status.should == :dispute
+      subject.status_name.should == 'Em disputa'
+    end
+
+    it 'should be refunded' do
+      param!(:status, '6')
       subject.status.should == :refunded
+      subject.status_name.should == 'Devolvida'
+    end
+
+    it 'should be canceled' do
+      param!(:status, '7')
+      subject.status.should == :canceled
+      subject.status_name.should == 'Cancelada'
     end
   end
 
-  describe "payment mapping" do
-    it "should be credit card" do
-      set_payment!("Cartão de Crédito")
+  describe 'transaction type mapping' do
+    it 'should be payment' do
+      param!(:type, '1')
+      subject.transaction_type.should == :payment
+      subject.transaction_type_name.should == 'Pagamento'
+    end
+
+    it 'should be transfer' do
+      param!(:type, '2')
+      subject.transaction_type.should == :transfer
+      subject.transaction_type_name.should == 'Transferência'
+    end
+
+    it 'should be adding funds' do
+      param!(:type, '3')
+      subject.transaction_type.should == :adding_funds
+      subject.transaction_type_name.should == 'Adição de fundos'
+    end
+
+    it 'should be charging' do
+      param!(:type, '4')
+      subject.transaction_type.should == :charging
+      subject.transaction_type_name.should == 'Cobrança'
+    end
+
+    it 'should be bonus' do
+      param!(:type, '5')
+      subject.transaction_type.should == :bonus
+      subject.transaction_type_name.should == 'Bônus'
+    end
+  end
+
+  describe 'payment method mapping' do
+    it 'should be credit card' do
+      set_payment_method!('1')
       subject.payment_method.should == :credit_card
+      subject.payment_method_name.should == 'Cartão de crédito'
     end
 
-    it "should be invoice" do
-      set_payment!("Boleto")
+    it 'should be invoice' do
+      set_payment_method!('2')
       subject.payment_method.should == :invoice
+      subject.payment_method_name.should == 'Boleto'
     end
 
-    it "should be pagseguro" do
-      set_payment!("Pagamento")
+    it 'should be online debit' do
+      set_payment_method!('3')
+      subject.payment_method.should == :online_debit
+      subject.payment_method_name.should == 'Débito online'
+    end
+
+    it 'should be pagseguro' do
+      set_payment_method!('4')
       subject.payment_method.should == :pagseguro
+      subject.payment_method_name.should == 'Saldo PagSeguro'
     end
 
-    it "should be online transfer" do
-      set_payment!("Pagamento Online")
-      subject.payment_method.should == :online_transfer
-    end
-
-    it "should be donation" do
-      set_payment!("Doação")
-      subject.payment_method.should == :donation
+    it 'should be oi paggo' do
+      set_payment_method!('5')
+      subject.payment_method.should == :oi_paggo
+      subject.payment_method_name.should == 'Oi Paggo'
     end
   end
 
-  describe "buyer mapping" do
-    it "should return client name" do
-      param!("CliNome", "John Doe")
-      subject.buyer[:name].should == "John Doe"
+  describe 'payment method extra information mapping' do
+    it 'should be visa' do
+      set_payment_method_extra_info!('101')
+      subject.payment_method_extra_info.should == :visa
+      subject.payment_method_extra_info_name.should == 'Visa'
     end
 
-    it "should return client email" do
-      param!("CliEmail", "john@doe.com")
-      subject.buyer[:email].should == "john@doe.com"
+    it 'should be martercard' do
+      set_payment_method_extra_info!('102')
+      subject.payment_method_extra_info.should == :martercard
+      subject.payment_method_extra_info_name.should == 'MasterCard'
     end
 
-    it "should return client phone" do
-      param!("CliTelefone", "11 55551234")
-      subject.buyer[:phone][:area_code].should == "11"
-      subject.buyer[:phone][:number].should == "55551234"
+    it 'should be american express' do
+      set_payment_method_extra_info!('103')
+      subject.payment_method_extra_info.should == :american_express
+      subject.payment_method_extra_info_name.should == 'American Express'
     end
 
-    describe "address" do
-      it "should return street" do
-        param!("CliEndereco", "Av. Paulista")
-        subject.buyer[:address][:street].should == "Av. Paulista"
-      end
+    it 'should be diners' do
+      set_payment_method_extra_info!('104')
+      subject.payment_method_extra_info.should == :diners
+      subject.payment_method_extra_info_name.should == 'Diners'
+    end
 
-      it "should return number" do
-        param!("CliNumero", "2500")
-        subject.buyer[:address][:number].should == "2500"
-      end
+    it 'should be hipercard' do
+      set_payment_method_extra_info!('105')
+      subject.payment_method_extra_info.should == :hipercard
+      subject.payment_method_extra_info_name.should == 'Hipercard'
+    end
 
-      it "should return complements" do
-        param!("CliComplemento", "Apto 123-A")
-        subject.buyer[:address][:complements].should == "Apto 123-A"
-      end
+    it 'should be aura' do
+      set_payment_method_extra_info!('106')
+      subject.payment_method_extra_info.should == :aura
+      subject.payment_method_extra_info_name.should == 'Aura'
+    end
 
-      it "should return neighbourhood" do
-        param!("CliBairro", "Bela Vista")
-        subject.buyer[:address][:neighbourhood].should == "Bela Vista"
-      end
+    it 'should be elo' do
+      set_payment_method_extra_info!('107')
+      subject.payment_method_extra_info.should == :elo
+      subject.payment_method_extra_info_name.should == 'Elo'
+    end
 
-      it "should return city" do
-        param!("CliCidade", "São Paulo")
-        subject.buyer[:address][:city].should == "São Paulo"
-      end
+    it 'should be bradesco' do
+      set_payment_method_extra_info!('201')
+      subject.payment_method_extra_info.should == :bradesco
+      subject.payment_method_extra_info_name.should == 'Bradesco'
+    end
 
-      it "should return state" do
-        param!("CliEstado", "SP")
-        subject.buyer[:address][:state].should == "SP"
-      end
+    it 'should be santander' do
+      set_payment_method_extra_info!('202')
+      subject.payment_method_extra_info.should == :santander
+      subject.payment_method_extra_info_name.should == 'Santander'
+    end
 
-      it "should return postal code" do
-        param!("CliCEP", "01310300")
-        subject.buyer[:address][:postal_code].should == "01310300"
-      end
+    it 'should be bradesco' do
+      set_payment_method_extra_info!('301')
+      subject.payment_method_extra_info.should == :bradesco
+      subject.payment_method_extra_info_name.should == 'Bradesco'
+    end
+
+    it 'should be itau' do
+      set_payment_method_extra_info!('302')
+      subject.payment_method_extra_info.should == :itau
+      subject.payment_method_extra_info_name.should == 'Itaú'
+    end
+
+    it 'should be unibanco' do
+      set_payment_method_extra_info!('303')
+      subject.payment_method_extra_info.should == :unibanco
+      subject.payment_method_extra_info_name.should == 'Unibanco'
+    end
+
+    it 'should be branco do brasil' do
+      set_payment_method_extra_info!('304')
+      subject.payment_method_extra_info.should == :banco_do_brasil
+      subject.payment_method_extra_info_name.should == 'Banco do Brasil'
+    end
+
+    it 'should be branco real' do
+      set_payment_method_extra_info!('305')
+      subject.payment_method_extra_info.should == :banco_real
+      subject.payment_method_extra_info_name.should == 'Banco Real'
+    end
+
+    it 'should be banrisul' do
+      set_payment_method_extra_info!('306')
+      subject.payment_method_extra_info.should == :banrisul
+      subject.payment_method_extra_info_name.should == 'Banrisul'
+    end
+
+    it 'should be pagseguro' do
+      set_payment_method_extra_info!('401')
+      subject.payment_method_extra_info.should == :pagseguro
+      subject.payment_method_extra_info_name.should == 'Saldo PagSeguro'
+    end
+
+    it 'should be oi paggo' do
+      set_payment_method_extra_info!('501')
+      subject.payment_method_extra_info.should == :oi_paggo
+      subject.payment_method_extra_info_name.should == 'Oi Paggo'
     end
   end
 
-  describe "other mappings" do
-    it "should map the order id" do
-      param!("Referencia", "ABCDEF")
-      subject.order_id.should == "ABCDEF"
+  describe 'other mappings' do
+    it 'should map the order id' do
+      param!(:reference, 'ABCDEF')
+      subject.reference.should == 'ABCDEF'
     end
 
-    it "should map the processing date" do
-      param!("DataTransacao", "04/09/2009 16:23:44")
-      subject.processed_at.should == Time.parse("2009-09-04 16:23:44").utc
+    it 'should map the processing date' do
+      param!(:date, '2011-02-10T16:13:41.000-03:00')
+      subject.date.should == '2011-02-10T16:13:41.000-03:00'.to_datetime
     end
 
-    it "should map the shipping type" do
-      param!("TipoFrete", "SD")
-      subject.shipping_type.should == "SD"
+    it 'should map the order id' do
+      param!(:code, '9E884542-81B3-4419-9A75-BCC6FB495EF1')
+      subject.code.should == '9E884542-81B3-4419-9A75-BCC6FB495EF1'
     end
 
-    it "should map the client annotation" do
-      param!("Anotacao", "Gift package, please!")
-      subject.notes.should == "Gift package, please!"
+    it 'should map the gross amount' do
+      param!(:gross_amount, '25.45')
+      subject.gross_amount.should == 25.45
     end
 
-    it "should map the shipping price" do
-      param!("ValorFrete", "199,38")
-      subject.shipping.should == 199.38
-
-      param!("ValorFrete", "1.799,38")
-      subject.shipping.should == 1799.38
+    it 'should map the discount amount' do
+      param!(:discount_amount, '1.10')
+      subject.discount_amount.should == 1.10
     end
 
-    it "should map the transaction id" do
-      param!("TransacaoID", "ABCDEF")
-      subject.transaction_id.should == "ABCDEF"
+    it 'should map the fee amount' do
+      param!(:fee_amount, '5.20')
+      subject.fee_amount.should == 5.20
+    end
+
+    it 'should map the net amount' do
+      param!(:net_amount, '18.69')
+      subject.net_amount.should == 18.69
+    end
+
+    it 'should map the extra amount' do
+      param!(:extra_amount, '7.12')
+      subject.extra_amount.should == 7.12
+    end
+
+    it 'should map the installment count' do
+      param!(:installment_count, '12')
+      subject.installment_count.should == 12
+    end
+
+    it 'should map the item count' do
+      param!(:item_count, '5')
+      subject.item_count.should == 5
     end
   end
 
-  describe "products" do
-    before do
-      @__products = []
-    end
+  context 'products mapping' do
+    it 'should map the products items' do
+      set_product! :id => '13', :description => 'Ruby 1.9 PDF', :amount => '12.90', :quantity => '3'
+      set_product! :id => '14', :description => 'Rails 3.1 PDF', :amount => '10.00', :quantity => '1'
 
-    it "should map 5 products" do
-      param!("NumItens", "5")
-      subject.products.should have(5).items
-    end
+      subject.products.should have(2).items
 
-    it "should map 25 products" do
-      param!("NumItens", "25")
-      subject.products.should have(25).items
-    end
-
-    it "should set attributes with defaults" do
-      set_product! :description => "Ruby 1.9 PDF", :price => "12,90", :id => 1
       p = subject.products.first
+      p[:id].should == '13'
+      p[:description].should == 'Ruby 1.9 PDF'
+      p[:amount].should == 12.90
+      p[:quantity].should == 3
 
-      p[:description].should == "Ruby 1.9 PDF"
-      p[:price].should == 12.90
-      p[:id].should == "1"
+      p = subject.products.last
+      p[:id].should == '14'
+      p[:description].should == 'Rails 3.1 PDF'
+      p[:amount].should == 10.0
       p[:quantity].should == 1
-      p[:fees].should be_zero
-      p[:shipping].should be_zero
-    end
-
-    it "should set attributes with custom values" do
-      set_product!({
-        :description => "Rails Application Templates",
-        :price => "1,00",
-        :id => 8,
-        :fees => "2,53",
-        :shipping => "3,50",
-        :quantity => 10
-      })
-
-      p = subject.products.first
-
-      p[:description].should == "Rails Application Templates"
-      p[:price].should == 1.00
-      p[:id].should == "8"
-      p[:quantity].should == 10
-      p[:fees].should == 2.53
-      p[:shipping].should == 3.50
-    end
-
-    specify "bug fix: should work correctly when price is 0.9" do
-      set_product!({
-        :price => ",90",
-      })
-
-      p = subject.products.first
-
-      p[:price].should == 0.9
     end
   end
 
-  describe "confirmation" do
-    before do
-      PagSeguro.stub :developer? => false
-      @url = PagSeguro::Notification::API_URL
-      subject.stub :api_url => @url
+  describe 'buyer mapping' do
+    it 'should map the buyer info' do
+      set_buyer! :email => 'john@doe.com', :name => 'John Doe',
+                 :phone => { :area_code => '11', :number => '55551234' }
+
+      subject.buyer[:email].should == 'john@doe.com'
+      subject.buyer[:name].should == 'John Doe'
+      subject.buyer[:phone][:area_code].should == '11'
+      subject.buyer[:phone][:number].should == '55551234'
+    end
+  end
+
+  describe 'shipping mapping' do
+    context 'type' do
+      it 'normal' do
+        set_shipping! :type => '1'
+        subject.shipping[:type] == :normal
+        subject.shipping[:type_name] == 'Encomenda normal'
+      end
+
+      it 'sedex' do
+        set_shipping! :type => '2'
+        subject.shipping[:type] == :sedex
+        subject.shipping[:type_name] == 'SEDEX'
+      end
+
+      it 'unspecified' do
+        set_shipping! :type => '3'
+        subject.shipping[:type] == :unspecified
+        subject.shipping[:type_name] == 'Não especificado'
+      end
     end
 
-    it "should be valid" do
-      FakeWeb.register_uri(:post, @url, :body => "VERIFICADO")
-      subject.should be_valid
+    it 'should return cost' do
+      set_shipping! :cost => '1.85'
+      subject.shipping[:cost].should == 1.85
     end
 
-    it "should be invalid" do
-      FakeWeb.register_uri(:post, @url, :body => "")
-      subject.should_not be_valid
-    end
+    context 'address' do
+      it 'should return country' do
+        set_shipping! :address => { :country => 'BRA' }
+        subject.shipping[:address][:country].should == 'BRA'
+      end
 
-    it "should force validation" do
-      FakeWeb.register_uri(:post, @url, :body => "")
-      subject.should_not be_valid
+      it 'should return state' do
+        set_shipping! :address => { :state => 'SP' }
+        subject.shipping[:address][:state].should == 'SP'
+      end
 
-      FakeWeb.register_uri(:post, @url, :body => "VERIFICADO")
-      subject.should_not be_valid
-      subject.should be_valid(:nocache)
-    end
+      it 'should return city' do
+        set_shipping! :address => { :city => 'São Paulo' }
+        subject.shipping[:address][:city].should == 'São Paulo'
+      end
 
-    it "should set the authenticity token from the initialization" do
-      notification = PagSeguro::Notification.new(@the_params, 'ABCDEF')
+      it 'should return postal code' do
+        set_shipping! :address => { :postal_code => '01310300' }
+        subject.shipping[:address][:postal_code].should == '01310300'
+      end
 
-      post = mock("post").as_null_object
-      post.should_receive(:form_data=).with({:Comando => "validar", :Token => "ABCDEF"})
+      it 'should return district' do
+        set_shipping! :address => { :district => 'Bela Vista' }
+        subject.shipping[:address][:district].should == 'Bela Vista'
+      end
 
-      Net::HTTP.should_receive(:new).and_return(mock("http").as_null_object)
-      Net::HTTP::Post.should_receive(:new).and_return(post)
+      it 'should return street' do
+        set_shipping! :address => { :street => 'Av. Paulista' }
+        subject.shipping[:address][:street].should == 'Av. Paulista'
+      end
 
-      notification.valid?
-    end
+      it 'should return number' do
+        set_shipping! :address => { :number => '2500' }
+        subject.shipping[:address][:number].should == '2500'
+      end
 
-    it "should set the authenticity token from the configuration" do
-      PagSeguro.stub :config => {"authenticity_token" => "ABCDEF"}
-
-      post = mock("post").as_null_object
-      post.should_receive(:form_data=).with({:Comando => "validar", :Token => "ABCDEF"})
-
-      Net::HTTP.should_receive(:new).and_return(mock("http").as_null_object)
-      Net::HTTP::Post.should_receive(:new).and_return(post)
-
-      subject.valid?
-    end
-
-    it "should propagate params" do
-      param!("VendedorEmail", "john@doe.com")
-      param!("NumItens", "14")
-      PagSeguro.stub :config => {"authenticity_token" => "ABCDEF"}
-
-      post = mock("post").as_null_object
-      post.should_receive(:form_data=).with({
-        :Comando => "validar",
-        :Token => "ABCDEF",
-        "VendedorEmail" => "john@doe.com",
-        "NumItens" => "14"
-      })
-
-      Net::HTTP.should_receive(:new).and_return(mock("http").as_null_object)
-      Net::HTTP::Post.should_receive(:new).and_return(post)
-
-      subject.valid?
+      it 'should return complement' do
+        set_shipping! :address => { :complement => 'Apto 123-A' }
+        subject.shipping[:address][:complement].should == 'Apto 123-A'
+      end
     end
   end
 
   private
-  def set_status!(value)
-    param!("StatusTransacao", value)
+  def set_payment_method!(value)
+    subject.params[:payment_method] ||= {}
+    subject.params[:payment_method].merge!(:type => value)
   end
 
-  def set_payment!(value)
-    param!("TipoPagamento", value)
+  def set_payment_method_extra_info!(value)
+    subject.params[:payment_method] ||= {}
+    subject.params[:payment_method].merge!(:code => value)
+  end
+
+  def set_buyer!(options)
+    subject.params[:sender] ||= {}
+    subject.params[:sender].merge!(options)
+  end
+
+  def set_shipping!(options)
+    options = { :type => '1' }.merge(options)
+    subject.params[:shipping] ||= {}
+    subject.params[:shipping].merge!(options)
   end
 
   def param!(name, value)
     subject.params.merge!(name => value)
   end
 
-  def set_product!(options={})
-    @__products ||= []
+  def set_product!(options)
+    subject.params[:items] ||= {}
+    subject.params[:items][:item] ||= []
 
-    i = @__products.size + 1
-
-    options = {
-      :quantity => 1,
-      :fees => "0,00",
-      :shipping => "0,00"
-    }.merge(options)
-
-    @__products << {
-      "ProdID_#{i}" => options[:id].to_s,
-      "ProdDescricao_#{i}" => options[:description].to_s,
-      "ProdValor_#{i}" => options[:price].to_s,
-      "ProdFrete_#{i}" => options[:shipping].to_s,
-      "ProdExtras_#{i}" => options[:fees].to_s,
-      "ProdQuantidade_#{i}" => options[:quantity].to_s
+    subject.params[:items][:item] << {
+      :id => options[:id],
+      :description => options[:description],
+      :amount => options[:amount],
+      :quantity => options[:quantity]
     }
-
-    subject.params.merge!(@__products.last)
-    subject.params.merge!("NumItens" => i)
-    @__products.last
   end
 end
+

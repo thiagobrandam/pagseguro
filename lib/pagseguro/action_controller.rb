@@ -1,11 +1,25 @@
 module PagSeguro
   module ActionController
     private
-    def pagseguro_notification(token = nil, &block)
+    def pagseguro_notification(email=nil, token=nil, &block)
+      # TODO: make tests
       return unless request.post?
+      query = {:query => { :email => email || PagSeguro.config['email'],
+                          :token => token || PagSeguro.config['authenticity_token'] }}
 
-      notification = PagSeguro::Notification.new(params, token)
-      yield notification if notification.valid?
+      response = HTTParty.get(
+                   PagSeguro.notification_url(params['notificationCode']),
+                   query).
+                 parsed_response.
+                 recursive_symbolize_underscorize_keys!
+
+      notification = PagSeguro::Notification.new(response[:transaction])
+      yield notification
+    end
+
+    # TODO: make tests
+    def pagseguro_payment_path(code)
+      PagSeguro.notification_url + "/#{code}"
     end
 
     def pagseguro_payment_path(code)
@@ -17,8 +31,8 @@ module PagSeguro
 
       # Add required params
       params = {
-	      :email => (order.email ? order.email : PagSeguro.config['email']),
-	      :token => (order.token ? order.token : PagSeguro.config['authenticity_token']),
+	      :email => order.email || PagSeguro.config['email'],
+	      :token => order.token || PagSeguro.config['authenticity_token'],
 	      :currency => 'BRL',
 	      :reference => order.reference
       }
@@ -50,14 +64,14 @@ module PagSeguro
 	    response = HTTParty.post(PagSeguro.gateway_url, post_options).parsed_response
 
 	    return :errors => [{:code => 'HTTP 401', :message => 'Unauthorized'}] if response == 'Unauthorized'
-	    hash = response.recursive_symbolize_keys
-	    if hash[:checkout]
-  	    hash[:checkout][:date] = hash[:checkout][:date].to_datetime
-        return hash[:checkout]
+	    response.recursive_symbolize_underscorize_keys!
+	    if response[:checkout]
+  	    response[:checkout][:date] = response[:checkout][:date].to_datetime
+        return response[:checkout]
       else
-        errors = hash[:errors][:error]
-        hash[:errors] = (errors.class == Hash) ? [errors] : errors
-        return hash
+        errors = response[:errors][:error]
+        response[:errors] = (errors.class == Hash) ? [errors] : errors
+        return response
       end
     end
   end

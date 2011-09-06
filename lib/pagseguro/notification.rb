@@ -1,40 +1,67 @@
 # encoding: utf-8
 module PagSeguro
   class Notification
-    API_URL = "https://pagseguro.uol.com.br/Security/NPI/Default.aspx"
-
-    # Map all the attributes from PagSeguro.
-    #
-    MAPPING = {
-      :payment_method => "TipoPagamento",
-      :order_id       => "Referencia",
-      :processed_at   => "DataTransacao",
-      :status         => "StatusTransacao",
-      :transaction_id => "TransacaoID",
-      :shipping_type  => "TipoFrete",
-      :shipping       => "ValorFrete",
-      :notes          => "Anotacao"
-    }
 
     # Map order status from PagSeguro.
     #
     STATUS = {
-      "Completo"          => :completed,
-      "Aguardando Pagto"  => :pending,
-      "Aprovado"          => :approved,
-      "Em Análise"        => :verifying,
-      "Cancelado"         => :canceled,
-      "Devolvido"         => :refunded
+      1 => { :sym => :pending, :name => 'Aguardando pagamento' },
+      2 => { :sym => :verifying, :name => 'Em análise' },
+      3 => { :sym => :paid, :name => 'Paga' },
+      4 => { :sym => :available, :name => 'Disponível' },
+      5 => { :sym => :dispute, :name => 'Em disputa' },
+      6 => { :sym => :refunded, :name => 'Devolvida' },
+      7 => { :sym => :canceled, :name => 'Cancelada' }
     }
 
-    # Map payment method from PagSeguro.
+    # Map the transaction type.
+    #
+    TRANSACTION_TYPE = {
+      1 => { :sym => :payment, :name => 'Pagamento' },
+      2 => { :sym => :transfer, :name => 'Transferência' },
+      3 => { :sym => :adding_funds, :name => 'Adição de fundos' },
+      4 => { :sym => :charging, :name => 'Cobrança' },
+      5 => { :sym => :bonus, :name => 'Bônus' }
+    }
+
+    # Map payment method type from PagSeguro.
     #
     PAYMENT_METHOD = {
-      "Cartão de Crédito" => :credit_card,
-      "Boleto"            => :invoice,
-      "Pagamento"         => :pagseguro,
-      "Pagamento Online"  => :online_transfer,
-      "Doação"            => :donation
+      1 => { :sym => :credit_card, :name => 'Cartão de crédito' },
+      2 => { :sym => :invoice, :name => 'Boleto' },
+      3 => { :sym => :online_debit, :name => 'Débito online' },
+      4 => { :sym => :pagseguro, :name => 'Saldo PagSeguro' },
+      5 => { :sym => :oi_paggo, :name => 'Oi Paggo' }
+    }
+
+    # Map payment method extra information from PagSeguro.
+    #
+    PAYMENT_METHOD_EXTRA_INFO = {
+      101 => { :sym => :visa, :name => 'Visa' },
+      102 => { :sym => :martercard, :name => 'MasterCard' },
+      103 => { :sym => :american_express, :name => 'American Express' },
+      104 => { :sym => :diners, :name => 'Diners' },
+      105 => { :sym => :hipercard, :name => 'Hipercard' },
+      106 => { :sym => :aura, :name => 'Aura' },
+      107 => { :sym => :elo, :name => 'Elo' },
+      201 => { :sym => :bradesco, :name => 'Bradesco' },
+      202 => { :sym => :santander, :name => 'Santander' },
+      301 => { :sym => :bradesco, :name => 'Bradesco' },
+      302 => { :sym => :itau, :name => 'Itaú' },
+      303 => { :sym => :unibanco, :name => 'Unibanco' },
+      304 => { :sym => :banco_do_brasil, :name => 'Banco do Brasil' },
+      305 => { :sym => :banco_real, :name => 'Banco Real' },
+      306 => { :sym => :banrisul, :name => 'Banrisul' },
+      401 => { :sym => :pagseguro, :name => 'Saldo PagSeguro' },
+      501 => { :sym => :oi_paggo, :name => 'Oi Paggo' }
+    }
+
+    # Map the shipping type.
+    #
+    SHIPPING_TYPE = {
+      1 => { :sym => :normal, :name => 'Encomenda normal' },
+      2 => { :sym => :sedex, :name => 'SEDEX' },
+      3 => { :sym => :unspecified, :name => 'Não especificado' }
     }
 
     # The Rails params hash.
@@ -45,8 +72,7 @@ module PagSeguro
     # PagSeguro will send POST with ISO-8859-1 encoded data,
     # so we need to normalize it to UTF-8.
     #
-    def initialize(params, token = nil)
-      @token = token
+    def initialize(params)
       @params = PagSeguro.developer? ? params : normalize(params)
     end
 
@@ -66,116 +92,85 @@ module PagSeguro
       end
     end
 
+    def status
+      STATUS[params[:status].to_i][:sym]
+    end
+
+    def status_name
+      STATUS[params[:status].to_i][:name]
+    end
+
+    def transaction_type
+      TRANSACTION_TYPE[params[:type].to_i][:sym]
+    end
+
+    def transaction_type_name
+      TRANSACTION_TYPE[params[:type].to_i][:name]
+    end
+
+    def payment_method
+      PAYMENT_METHOD[params[:payment_method][:type].to_i][:sym]
+    end
+
+    def payment_method_name
+      PAYMENT_METHOD[params[:payment_method][:type].to_i][:name]
+    end
+
+    def payment_method_extra_info
+      PAYMENT_METHOD_EXTRA_INFO[params[:payment_method][:code].to_i][:sym]
+    end
+
+    def payment_method_extra_info_name
+      PAYMENT_METHOD_EXTRA_INFO[params[:payment_method][:code].to_i][:name]
+    end
+
+    def date
+      params[:date].to_datetime
+    end
+
+    def buyer
+      params[:sender]
+    end
+
     # Return a list of products sent by PagSeguro.
     # The values will be normalized
-    # (e.g. currencies will be converted to cents, quantity will be an integer)
+    # (e.g. amount will be converted to cents, quantity will be an integer)
     #
     def products
       @products ||= begin
-        items = []
-
-        for i in (1..params["NumItens"].to_i)
-          items << {
-            :id          => params["ProdID_#{i}"],
-            :description => params["ProdDescricao_#{i}"],
-            :quantity    => params["ProdQuantidade_#{i}"].to_i,
-            :price       => to_price(params["ProdValor_#{i}"]),
-            :shipping    => to_price(params["ProdFrete_#{i}"]),
-            :fees        => to_price(params["ProdExtras_#{i}"])
-          }
+        params[:items][:item].each do |item|
+          item[:quantity] = item[:quantity].to_i
+          item[:amount] = item[:amount].to_f
         end
-
-        items
       end
     end
 
-    # Return the shipping fee.
-    # Will be converted to a float number.
-    #
     def shipping
-      to_price mapping_for(:shipping)
-    end
+      @shipping ||= begin
+        shipping_type = params[:shipping][:type].to_i
+        params[:shipping][:type] = SHIPPING_TYPE[shipping_type][:sym]
+        params[:shipping][:type_name] = SHIPPING_TYPE[shipping_type][:name]
 
-    # Return the order status.
-    # Will be mapped to the STATUS constant.
-    #
-    def status
-      @status ||= STATUS[mapping_for(:status)]
-    end
+        params[:shipping][:cost] = params[:shipping][:cost].to_f if params[:shipping][:cost]
 
-    # Return the payment method.
-    # Will be mapped to the PAYMENT_METHOD constant.
-    #
-    def payment_method
-      @payment_method ||= PAYMENT_METHOD[mapping_for(:payment_method)]
-    end
-
-    # Parse the processing date to a Ruby object.
-    #
-    def processed_at
-      @processed_at ||= begin
-        groups = *mapping_for(:processed_at).match(/(\d{2})\/(\d{2})\/(\d{4}) ([\d:]+)/sm)
-        Time.parse("#{groups[3]}-#{groups[2]}-#{groups[1]} #{groups[4]}")
+        params[:shipping]
       end
-    end
-
-    # Return the buyer info.
-    #
-    def buyer
-      @buyer ||= {
-        :name    => params["CliNome"],
-        :email   => params["CliEmail"],
-        :phone   => {
-          :area_code => params["CliTelefone"].to_s.split(" ").first,
-          :number => params["CliTelefone"].to_s.split(" ").last
-        },
-        :address => {
-          :street => params["CliEndereco"],
-          :number => params["CliNumero"],
-          :complements => params["CliComplemento"],
-          :neighbourhood => params["CliBairro"],
-          :city => params["CliCidade"],
-          :state => params["CliEstado"],
-          :postal_code => params["CliCEP"]
-        }
-      }
     end
 
     def method_missing(method, *args)
-      return mapping_for(method) if MAPPING[method]
+      # Attributes that return string
+      string = [:reference, :code]
+      return params[method] if string.include?(method)
+
+      # Attributes that return float
+      float = [:gross_amount, :discount_amount, :fee_amount, :net_amount, :extra_amount]
+      return params[method].to_f if float.include?(method)
+
+      # Attributes that return integer
+      int = [:installment_count, :item_count]
+      return params[method].to_i if int.include?(method)
+
       super
-    end
-
-    def respond_to?(method, include_private = false)
-      return true if MAPPING[method]
-      super
-    end
-
-    # A wrapper to the params hash,
-    # sanitizing the return to symbols.
-    #
-    def mapping_for(name)
-      params[MAPPING[name]]
-    end
-
-    # Cache the validation.
-    # To bypass the cache, just provide an argument that is evaluated as true.
-    #
-    #   invoice.valid?
-    #   invoice.valid?(:nocache)
-    #
-    def valid?(force=false)
-      @valid = nil if force
-      @valid = validates? if @valid.nil?
-      @valid
-    end
-
-    # Return all useful properties in a single hash.
-    #
-    def to_hash
-      MAPPING.inject({}) do |buffer, (name,value)|
-        buffer.merge(name => __send__(name))
-      end
     end
 
     private
@@ -190,38 +185,6 @@ module PagSeguro
 
       hash
     end
-
-    # Convert amount format to float.
-    #
-    def to_price(amount)
-      amount = "0#{amount}" if amount =~ /^\,/
-      amount.to_s.gsub(/[^\d]/, "").gsub(/^(\d+)(\d{2})$/, '\1.\2').to_f
-    end
-
-    # Check if the provided data is valid by requesting the
-    # confirmation API url. The request will always be valid while running in
-    # developer mode.
-    #
-    def validates?
-      return true if PagSeguro.developer?
-
-      # include the params to validate our request
-      request_params = params.merge({
-        :Comando => "validar",
-        :Token => @token || PagSeguro.config["authenticity_token"]
-      }).dup
-
-      # do the request
-      uri = URI.parse(API_URL)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-      http.ca_file = File.dirname(__FILE__) + "/cacert.pem"
-
-      request = Net::HTTP::Post.new(uri.path)
-      request.form_data = denormalize(request_params)
-      response = http.start {|r| r.request request }
-      (response.body =~ /VERIFICADO/) != nil
-    end
   end
 end
+

@@ -27,15 +27,44 @@ describe PagSeguro do
       expect { PagSeguro.config }.to raise_error(PagSeguro::MissingEnvironmentError)
     end
 
-    it "should return local url if developer mode is enabled" do
-      PagSeguro.should_receive(:developer?).and_return(true)
-      PagSeguro.gateway_url.should == "http://localhost:3000/pagseguro_developer"
+    context 'urls' do
+      context 'gateway' do
+        it "should return local url if developer mode is enabled" do
+          PagSeguro.should_receive(:developer?).and_return(true)
+          PagSeguro.gateway_url.should == "http://localhost:3000/pagseguro_developer"
+        end
+
+        it "should return real url if developer mode is disabled" do
+          PagSeguro.should_receive(:developer?).and_return(false)
+          PagSeguro.gateway_url.should == "https://ws.pagseguro.uol.com.br/v2/checkout"
+        end
+      end
+
+      context 'gateway payment' do
+        it "should return local url if developer mode is enabled" do
+          PagSeguro.should_receive(:developer?).and_return(true)
+          PagSeguro.gateway_payment_url.should == "http://localhost:3000/pagseguro_developer_payment"
+        end
+
+        it "should return real url if developer mode is disabled" do
+          PagSeguro.should_receive(:developer?).and_return(false)
+          PagSeguro.gateway_payment_url.should == "https://pagseguro.uol.com.br/v2/checkout/payment.html"
+        end
+      end
+
+      context 'gateway notification' do
+        it "should return local url if developer mode is enabled" do
+          PagSeguro.should_receive(:developer?).and_return(true)
+          PagSeguro.gateway_notification_url.should == "http://localhost:3000/pagseguro_developer_notification"
+        end
+
+        it "should return real url if developer mode is disabled" do
+          PagSeguro.should_receive(:developer?).and_return(false)
+          PagSeguro.gateway_notification_url.should == "https://ws.pagseguro.uol.com.br/v2/transactions/notifications"
+        end
+      end
     end
 
-    it "should return real url if developer mode is disabled" do
-      PagSeguro.should_receive(:developer?).and_return(false)
-      PagSeguro.gateway_url.should == "https://ws.pagseguro.uol.com.br/v2/checkout"
-    end
 
     it "should read configuration developer mode" do
       PagSeguro.stub :config => {"developer" => true}
