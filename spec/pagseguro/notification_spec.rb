@@ -10,43 +10,36 @@ describe PagSeguro::Notification do
     it 'should be pending' do
       param!(:status, '1')
       subject.status.should == :pending
-      subject.status_name.should == 'Aguardando pagamento'
     end
 
     it 'should be verifying' do
       param!(:status, '2')
       subject.status.should == :verifying
-      subject.status_name.should == 'Em análise'
     end
 
     it 'should be paid' do
       param!(:status, '3')
       subject.status.should == :paid
-      subject.status_name.should == 'Paga'
     end
 
     it 'should be available' do
       param!(:status, '4')
       subject.status.should == :available
-      subject.status_name.should == 'Disponível'
     end
 
     it 'should be dispute' do
       param!(:status, '5')
       subject.status.should == :dispute
-      subject.status_name.should == 'Em disputa'
     end
 
     it 'should be refunded' do
       param!(:status, '6')
       subject.status.should == :refunded
-      subject.status_name.should == 'Devolvida'
     end
 
     it 'should be canceled' do
       param!(:status, '7')
       subject.status.should == :canceled
-      subject.status_name.should == 'Cancelada'
     end
   end
 
@@ -54,31 +47,26 @@ describe PagSeguro::Notification do
     it 'should be payment' do
       param!(:type, '1')
       subject.transaction_type.should == :payment
-      subject.transaction_type_name.should == 'Pagamento'
     end
 
     it 'should be transfer' do
       param!(:type, '2')
       subject.transaction_type.should == :transfer
-      subject.transaction_type_name.should == 'Transferência'
     end
 
     it 'should be adding funds' do
       param!(:type, '3')
       subject.transaction_type.should == :adding_funds
-      subject.transaction_type_name.should == 'Adição de fundos'
     end
 
     it 'should be charging' do
       param!(:type, '4')
       subject.transaction_type.should == :charging
-      subject.transaction_type_name.should == 'Cobrança'
     end
 
     it 'should be bonus' do
       param!(:type, '5')
       subject.transaction_type.should == :bonus
-      subject.transaction_type_name.should == 'Bônus'
     end
   end
 
@@ -86,31 +74,26 @@ describe PagSeguro::Notification do
     it 'should be credit card' do
       set_payment_method!('1')
       subject.payment_method.should == :credit_card
-      subject.payment_method_name.should == 'Cartão de crédito'
     end
 
     it 'should be invoice' do
       set_payment_method!('2')
       subject.payment_method.should == :invoice
-      subject.payment_method_name.should == 'Boleto'
     end
 
     it 'should be online debit' do
       set_payment_method!('3')
       subject.payment_method.should == :online_debit
-      subject.payment_method_name.should == 'Débito online'
     end
 
     it 'should be pagseguro' do
       set_payment_method!('4')
       subject.payment_method.should == :pagseguro
-      subject.payment_method_name.should == 'Saldo PagSeguro'
     end
 
     it 'should be oi paggo' do
       set_payment_method!('5')
       subject.payment_method.should == :oi_paggo
-      subject.payment_method_name.should == 'Oi Paggo'
     end
   end
 
@@ -118,103 +101,86 @@ describe PagSeguro::Notification do
     it 'should be visa' do
       set_payment_method_extra_info!('101')
       subject.payment_method_extra_info.should == :visa
-      subject.payment_method_extra_info_name.should == 'Visa'
     end
 
     it 'should be martercard' do
       set_payment_method_extra_info!('102')
       subject.payment_method_extra_info.should == :martercard
-      subject.payment_method_extra_info_name.should == 'MasterCard'
     end
 
     it 'should be american express' do
       set_payment_method_extra_info!('103')
       subject.payment_method_extra_info.should == :american_express
-      subject.payment_method_extra_info_name.should == 'American Express'
     end
 
     it 'should be diners' do
       set_payment_method_extra_info!('104')
       subject.payment_method_extra_info.should == :diners
-      subject.payment_method_extra_info_name.should == 'Diners'
     end
 
     it 'should be hipercard' do
       set_payment_method_extra_info!('105')
       subject.payment_method_extra_info.should == :hipercard
-      subject.payment_method_extra_info_name.should == 'Hipercard'
     end
 
     it 'should be aura' do
       set_payment_method_extra_info!('106')
       subject.payment_method_extra_info.should == :aura
-      subject.payment_method_extra_info_name.should == 'Aura'
     end
 
     it 'should be elo' do
       set_payment_method_extra_info!('107')
       subject.payment_method_extra_info.should == :elo
-      subject.payment_method_extra_info_name.should == 'Elo'
     end
 
     it 'should be bradesco' do
       set_payment_method_extra_info!('201')
       subject.payment_method_extra_info.should == :bradesco
-      subject.payment_method_extra_info_name.should == 'Bradesco'
     end
 
     it 'should be santander' do
       set_payment_method_extra_info!('202')
       subject.payment_method_extra_info.should == :santander
-      subject.payment_method_extra_info_name.should == 'Santander'
     end
 
     it 'should be bradesco' do
       set_payment_method_extra_info!('301')
       subject.payment_method_extra_info.should == :bradesco
-      subject.payment_method_extra_info_name.should == 'Bradesco'
     end
 
     it 'should be itau' do
       set_payment_method_extra_info!('302')
       subject.payment_method_extra_info.should == :itau
-      subject.payment_method_extra_info_name.should == 'Itaú'
     end
 
     it 'should be unibanco' do
       set_payment_method_extra_info!('303')
       subject.payment_method_extra_info.should == :unibanco
-      subject.payment_method_extra_info_name.should == 'Unibanco'
     end
 
     it 'should be branco do brasil' do
       set_payment_method_extra_info!('304')
       subject.payment_method_extra_info.should == :banco_do_brasil
-      subject.payment_method_extra_info_name.should == 'Banco do Brasil'
     end
 
     it 'should be branco real' do
       set_payment_method_extra_info!('305')
       subject.payment_method_extra_info.should == :banco_real
-      subject.payment_method_extra_info_name.should == 'Banco Real'
     end
 
     it 'should be banrisul' do
       set_payment_method_extra_info!('306')
       subject.payment_method_extra_info.should == :banrisul
-      subject.payment_method_extra_info_name.should == 'Banrisul'
     end
 
     it 'should be pagseguro' do
       set_payment_method_extra_info!('401')
       subject.payment_method_extra_info.should == :pagseguro
-      subject.payment_method_extra_info_name.should == 'Saldo PagSeguro'
     end
 
     it 'should be oi paggo' do
       set_payment_method_extra_info!('501')
       subject.payment_method_extra_info.should == :oi_paggo
-      subject.payment_method_extra_info_name.should == 'Oi Paggo'
     end
   end
 
@@ -308,19 +274,16 @@ describe PagSeguro::Notification do
       it 'normal' do
         set_shipping! :type => '1'
         subject.shipping[:type] == :normal
-        subject.shipping[:type_name] == 'Encomenda normal'
       end
 
       it 'sedex' do
         set_shipping! :type => '2'
         subject.shipping[:type] == :sedex
-        subject.shipping[:type_name] == 'SEDEX'
       end
 
       it 'unspecified' do
         set_shipping! :type => '3'
         subject.shipping[:type] == :unspecified
-        subject.shipping[:type_name] == 'Não especificado'
       end
     end
 

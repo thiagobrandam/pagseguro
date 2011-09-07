@@ -5,63 +5,63 @@ module PagSeguro
     # Map order status from PagSeguro.
     #
     STATUS = {
-      1 => { :sym => :pending, :name => 'Aguardando pagamento' },
-      2 => { :sym => :verifying, :name => 'Em análise' },
-      3 => { :sym => :paid, :name => 'Paga' },
-      4 => { :sym => :available, :name => 'Disponível' },
-      5 => { :sym => :dispute, :name => 'Em disputa' },
-      6 => { :sym => :refunded, :name => 'Devolvida' },
-      7 => { :sym => :canceled, :name => 'Cancelada' }
+      1 => :pending,
+      2 => :verifying,
+      3 => :paid,
+      4 => :available,
+      5 => :dispute,
+      6 => :refunded,
+      7 => :canceled
     }
 
     # Map the transaction type.
     #
     TRANSACTION_TYPE = {
-      1 => { :sym => :payment, :name => 'Pagamento' },
-      2 => { :sym => :transfer, :name => 'Transferência' },
-      3 => { :sym => :adding_funds, :name => 'Adição de fundos' },
-      4 => { :sym => :charging, :name => 'Cobrança' },
-      5 => { :sym => :bonus, :name => 'Bônus' }
+      1 => :payment,
+      2 => :transfer,
+      3 => :adding_funds,
+      4 => :charging,
+      5 => :bonus
     }
 
     # Map payment method type from PagSeguro.
     #
     PAYMENT_METHOD = {
-      1 => { :sym => :credit_card, :name => 'Cartão de crédito' },
-      2 => { :sym => :invoice, :name => 'Boleto' },
-      3 => { :sym => :online_debit, :name => 'Débito online' },
-      4 => { :sym => :pagseguro, :name => 'Saldo PagSeguro' },
-      5 => { :sym => :oi_paggo, :name => 'Oi Paggo' }
+      1 => :credit_card,
+      2 => :invoice,
+      3 => :online_debit,
+      4 => :pagseguro,
+      5 => :oi_paggo
     }
 
     # Map payment method extra information from PagSeguro.
     #
     PAYMENT_METHOD_EXTRA_INFO = {
-      101 => { :sym => :visa, :name => 'Visa' },
-      102 => { :sym => :martercard, :name => 'MasterCard' },
-      103 => { :sym => :american_express, :name => 'American Express' },
-      104 => { :sym => :diners, :name => 'Diners' },
-      105 => { :sym => :hipercard, :name => 'Hipercard' },
-      106 => { :sym => :aura, :name => 'Aura' },
-      107 => { :sym => :elo, :name => 'Elo' },
-      201 => { :sym => :bradesco, :name => 'Bradesco' },
-      202 => { :sym => :santander, :name => 'Santander' },
-      301 => { :sym => :bradesco, :name => 'Bradesco' },
-      302 => { :sym => :itau, :name => 'Itaú' },
-      303 => { :sym => :unibanco, :name => 'Unibanco' },
-      304 => { :sym => :banco_do_brasil, :name => 'Banco do Brasil' },
-      305 => { :sym => :banco_real, :name => 'Banco Real' },
-      306 => { :sym => :banrisul, :name => 'Banrisul' },
-      401 => { :sym => :pagseguro, :name => 'Saldo PagSeguro' },
-      501 => { :sym => :oi_paggo, :name => 'Oi Paggo' }
+      101 => :visa,
+      102 => :martercard,
+      103 => :american_express,
+      104 => :diners,
+      105 => :hipercard,
+      106 => :aura,
+      107 => :elo,
+      201 => :bradesco,
+      202 => :santander,
+      301 => :bradesco,
+      302 => :itau,
+      303 => :unibanco,
+      304 => :banco_do_brasil,
+      305 => :banco_real,
+      306 => :banrisul,
+      401 => :pagseguro,
+      501 => :oi_paggo
     }
 
     # Map the shipping type.
     #
     SHIPPING_TYPE = {
-      1 => { :sym => :normal, :name => 'Encomenda normal' },
-      2 => { :sym => :sedex, :name => 'SEDEX' },
-      3 => { :sym => :unspecified, :name => 'Não especificado' }
+      1 => :normal,
+      2 => :sedex,
+      3 => :unspecified
     }
 
     # The Rails params hash.
@@ -93,35 +93,19 @@ module PagSeguro
     end
 
     def status
-      STATUS[params[:status].to_i][:sym]
-    end
-
-    def status_name
-      STATUS[params[:status].to_i][:name]
+      STATUS[params[:status].to_i]
     end
 
     def transaction_type
-      TRANSACTION_TYPE[params[:type].to_i][:sym]
-    end
-
-    def transaction_type_name
-      TRANSACTION_TYPE[params[:type].to_i][:name]
+      TRANSACTION_TYPE[params[:type].to_i]
     end
 
     def payment_method
-      PAYMENT_METHOD[params[:payment_method][:type].to_i][:sym]
-    end
-
-    def payment_method_name
-      PAYMENT_METHOD[params[:payment_method][:type].to_i][:name]
+      PAYMENT_METHOD[params[:payment_method][:type].to_i]
     end
 
     def payment_method_extra_info
-      PAYMENT_METHOD_EXTRA_INFO[params[:payment_method][:code].to_i][:sym]
-    end
-
-    def payment_method_extra_info_name
-      PAYMENT_METHOD_EXTRA_INFO[params[:payment_method][:code].to_i][:name]
+      PAYMENT_METHOD_EXTRA_INFO[params[:payment_method][:code].to_i]
     end
 
     def date
@@ -148,11 +132,8 @@ module PagSeguro
     def shipping
       @shipping ||= begin
         shipping_type = params[:shipping][:type].to_i
-        params[:shipping][:type] = SHIPPING_TYPE[shipping_type][:sym]
-        params[:shipping][:type_name] = SHIPPING_TYPE[shipping_type][:name]
-
+        params[:shipping][:type] = SHIPPING_TYPE[shipping_type]
         params[:shipping][:cost] = params[:shipping][:cost].to_f if params[:shipping][:cost]
-
         params[:shipping]
       end
     end

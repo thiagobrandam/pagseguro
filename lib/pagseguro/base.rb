@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module PagSeguro
   extend self
 
@@ -6,6 +7,69 @@ module PagSeguro
   GATEWAY_URL = "https://ws.pagseguro.uol.com.br/v2/checkout"
   GATEWAY_PAYMENT_URL = "https://pagseguro.uol.com.br/v2/checkout/payment.html"
   GATEWAY_NOTIFICATION_URL = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications"
+
+
+  # Map order status from PagSeguro.
+  #
+  STATUS = {
+    :pending => 'Aguardando pagamento',
+    :verifying => 'Em análise',
+    :paid => 'Paga',
+    :available => 'Disponível',
+    :dispute => 'Em disputa',
+    :refunded => 'Devolvida',
+    :canceled => 'Cancelada'
+  }
+
+  # Map the transaction type.
+  #
+  TRANSACTION_TYPE = {
+    :payment => 'Pagamento',
+    :transfer => 'Transferência',
+    :adding_funds => 'Adição de fundos',
+    :charging => 'Cobrança',
+    :bonus => 'Bônus'
+  }
+
+  # Map payment method type from PagSeguro.
+  #
+  PAYMENT_METHOD = {
+    :credit_card => 'Cartão de crédito',
+    :invoice => 'Boleto',
+    :online_debit => 'Débito online',
+    :pagseguro => 'Saldo PagSeguro',
+    :oi_paggo => 'Oi Paggo'
+  }
+
+  # Map payment method extra information from PagSeguro.
+  #
+  PAYMENT_METHOD_EXTRA_INFO = {
+    :visa => 'Visa',
+    :martercard => 'MasterCard',
+    :american_express => 'American Express',
+    :diners => 'Diners',
+    :hipercard => 'Hipercard',
+    :aura => 'Aura',
+    :elo => 'Elo',
+    :bradesco => 'Bradesco',
+    :santander => 'Santander',
+    :bradesco => 'Bradesco',
+    :itau => 'Itaú',
+    :unibanco => 'Unibanco',
+    :banco_do_brasil => 'Banco do Brasil',
+    :banco_real => 'Banco Real',
+    :banrisul => 'Banrisul',
+    :pagseguro => 'Saldo PagSeguro',
+    :oi_paggo => 'Oi Paggo'
+  }
+
+  # Map the shipping type.
+  #
+  SHIPPING_TYPE = {
+    :normal => 'Encomenda normal',
+    :sedex => 'SEDEX',
+    :unspecified => 'Não especificado'
+  }
 
   # Hold the config/pagseguro.yml contents
   @@config = nil
