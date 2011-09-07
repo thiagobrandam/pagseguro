@@ -1,15 +1,14 @@
 module PagSeguro
   module ActionController
     private
-    def pagseguro_notification(email=nil, token=nil, &block)
-      # TODO: make tests
+    def pagseguro_notification(options={}, &block)
       return unless request.post?
-      query = {:query => { :email => email || PagSeguro.config['email'],
-                          :token => token || PagSeguro.config['authenticity_token'] }}
+      query = { :email => options[:email] || PagSeguro.config['email'],
+                :token => options[:token] || PagSeguro.config['authenticity_token'] }
 
       response = HTTParty.get(
-                   PagSeguro.notification_url(params['notificationCode']),
-                   query).
+                   pagseguro_notification_path(params['notificationCode']),
+                   { :query => query }).
                  parsed_response.
                  recursive_symbolize_underscorize_keys!
 
@@ -17,9 +16,8 @@ module PagSeguro
       yield notification
     end
 
-    # TODO: make tests
-    def pagseguro_payment_path(code)
-      PagSeguro.notification_url + "/#{code}"
+    def pagseguro_notification_path(code)
+      PagSeguro.gateway_notification_url + "/#{code}"
     end
 
     def pagseguro_payment_path(code)
@@ -64,6 +62,7 @@ module PagSeguro
 	    response = HTTParty.post(PagSeguro.gateway_url, post_options).parsed_response
 
 	    return :errors => [{:code => 'HTTP 401', :message => 'Unauthorized'}] if response == 'Unauthorized'
+
 	    response.recursive_symbolize_underscorize_keys!
 	    if response[:checkout]
   	    response[:checkout][:date] = response[:checkout][:date].to_datetime
