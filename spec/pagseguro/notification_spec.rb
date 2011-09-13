@@ -237,7 +237,19 @@ describe PagSeguro::Notification do
   end
 
   context 'products mapping' do
-    it 'should map the products items' do
+    it 'should map one product' do
+      set_product! :id => '13', :description => 'Ruby 1.9 PDF', :amount => '12.90', :quantity => '3'
+
+      subject.products.should have(1).items
+
+      p = subject.products.first
+      p[:id].should == '13'
+      p[:description].should == 'Ruby 1.9 PDF'
+      p[:amount].should == 12.90
+      p[:quantity].should == 3
+    end
+
+    it 'should map more than on product' do
       set_product! :id => '13', :description => 'Ruby 1.9 PDF', :amount => '12.90', :quantity => '3'
       set_product! :id => '14', :description => 'Rails 3.1 PDF', :amount => '10.00', :quantity => '1'
 
@@ -363,14 +375,21 @@ describe PagSeguro::Notification do
 
   def set_product!(options)
     subject.params[:items] ||= {}
-    subject.params[:items][:item] ||= []
 
-    subject.params[:items][:item] << {
+    item = {
       :id => options[:id],
       :description => options[:description],
       :amount => options[:amount],
       :quantity => options[:quantity]
     }
+
+    if subject.params[:items][:item].nil?
+      subject.params[:items][:item] = item
+    elsif subject.params[:items][:item].class == Hash
+      subject.params[:items][:item] = [subject.params[:items][:item]] << item
+    elsif subject.params[:items][:item].class == Array
+      subject.params[:items][:item] << item
+    end
   end
 end
 

@@ -120,11 +120,22 @@ module PagSeguro
     # The values will be normalized
     # (e.g. amount will be converted to cents, quantity will be an integer)
     #
+    # Obs.: when products list has just one item, params[:items][:item] will
+    # be a Hash. When products list has more then one item params[:items][:item]
+    # will be an Array.
+    #
     def products
       @products ||= begin
-        params[:items][:item].each do |item|
-          item[:quantity] = item[:quantity].to_i
-          item[:amount] = item[:amount].to_f
+        items = params[:items][:item]
+        if items.class == Hash
+          items[:quantity] = items[:quantity].to_i
+          items[:amount] = items[:amount].to_f
+          [items]
+        else
+          items.each do |item|
+            item[:quantity] = item[:quantity].to_i
+            item[:amount] = item[:amount].to_f
+          end
         end
       end
     end
