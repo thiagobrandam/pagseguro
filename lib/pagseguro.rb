@@ -4,6 +4,7 @@ require "time"
 require "bigdecimal"
 require "httparty"
 
+require 'pagseguro/engine'
 require "pagseguro/base"
 require "pagseguro/faker"
 require "pagseguro/rake"

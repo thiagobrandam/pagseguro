@@ -12,3 +12,4 @@ module PagSeguro
 end
 
 PagSeguro::Application.initialize!
+
