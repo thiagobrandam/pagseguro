@@ -103,7 +103,7 @@ describe PagSeguro::Notification do
       subject.payment_method_extra_info.should == :visa
     end
 
-    it 'should be martercard' do
+    it 'should be mastercard' do
       set_payment_method_extra_info!('102')
       subject.payment_method_extra_info.should == :martercard
     end

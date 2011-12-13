@@ -90,6 +90,8 @@ module PagSeguro
         :quantity => 1
       }.merge(options)
 
+      options[:description] = "#{options[:description][0...97]}..." if options[:description] and options[:description].size > 100
+
       products.push(options)
     end
 

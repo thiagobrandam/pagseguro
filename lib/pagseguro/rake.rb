@@ -85,7 +85,7 @@ module PagSeguro
       end
 
       # Retrieve the specified status or default to :completed
-      status = env.fetch("STATUS", :completed).to_sym
+      status = env.fetch("STATUS", :paid).to_sym
 
       # Retrieve the specified payment method or default to :credit_card
       payment_method = env.fetch("PAYMENT_METHOD", :credit_card).to_sym

@@ -3,7 +3,8 @@ require "spec_helper"
 describe PagSeguro::Order do
   before do
     @order = PagSeguro::Order.new
-    @product = {:amount => 9.90, :description => "Ruby 1.9 PDF", :reference => 1}
+    @product = {:amount => 9.90, :reference => 1,
+        :description => "This is a description with more than 100 characters to test the limit imposed by PagSeguro. It's from a bug we've found during production."}
   end
 
   it "should set order reference when instantiating object" do
@@ -69,11 +70,17 @@ describe PagSeguro::Order do
 
     p = @order.products.first
     p[:amount].should == 9.90
-    p[:description].should == "Ruby 1.9 PDF"
+    p[:description].should == "This is a description with more than 100 characters to test the limit imposed by PagSeguro. It's ..."
     p[:reference].should == 1
     p[:quantity].should == 1
     p[:weight].should be_nil
     p[:shipping].should be_nil
+  end
+
+  it 'should truncate description string with 100 characters' do
+    @order << @product
+    p = @order.products.first
+    p[:description].should == "This is a description with more than 100 characters to test the limit imposed by PagSeguro. It's ..."
   end
 
   it "should add product with custom settings" do
@@ -82,7 +89,7 @@ describe PagSeguro::Order do
 
     p = @order.products.first
     p[:amount].should == 9.90
-    p[:description].should == "Ruby 1.9 PDF"
+    p[:description].should == "This is a description with more than 100 characters to test the limit imposed by PagSeguro. It's ..."
     p[:reference].should == 1
     p[:quantity].should == 3
     p[:weight].should == 100

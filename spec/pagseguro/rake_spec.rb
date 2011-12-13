@@ -36,8 +36,8 @@ describe PagSeguro::Rake do
   end
 
   it "should ping return URL with default arguments" do
-    params["StatusTransacao"].should == "Completo"
-    params["TipoPagamento"].should == "Cartão de Crédito"
+    params["StatusTransacao"].should == 3 # Code for :paid status
+    params["TipoPagamento"].should == 1 # Code for :credit_card payment_method
   end
 
   it "should ping return URL with provided arguments" do
@@ -46,8 +46,8 @@ describe PagSeguro::Rake do
 
     PagSeguro::Rake.run
 
-    params["StatusTransacao"].should == "Cancelado"
-    params["TipoPagamento"].should == "Boleto"
+    params["StatusTransacao"].should == 7 # Code for :canceled status
+    params["TipoPagamento"].should == 2 # Code for :invoice payment_method
   end
 
   it "should set order id" do
@@ -139,3 +139,4 @@ describe PagSeguro::Rake do
     $HTTP_PARAMS
   end
 end
+
