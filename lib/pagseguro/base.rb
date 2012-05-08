@@ -115,7 +115,7 @@ module PagSeguro
   # app is running in developer mode
   def gateway_payment_url
     if developer?
-      PagSeguro.config['base'] + '/pagseguro_developer_payment'
+      PagSeguro.config['base'] + '/pagseguro_developer/payment'
     else
       GATEWAY_PAYMENT_URL
     end
@@ -125,7 +125,7 @@ module PagSeguro
   # app is running in developer mode
   def gateway_notification_url
     if developer?
-      PagSeguro.config['base'] + '/pagseguro_developer_notification'
+      PagSeguro.config['base'] + '/pagseguro_developer/notification'
     else
       GATEWAY_NOTIFICATION_URL
     end
