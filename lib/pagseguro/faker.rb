@@ -1,4 +1,6 @@
-# -*- encoding: utf-8 -*-
+# encoding: utf-8
+require "digest/md5"
+
 module PagSeguro
   module Faker
     extend self
@@ -156,6 +158,20 @@ module PagSeguro
 
     def state
       STATES.sample
+    end
+
+    def checkout_xml
+      payment_code = Digest::MD5.hexdigest(Time.now.to_s)
+      payment_date = DateTime.now.to_s
+
+      builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
+        xml.checkout do
+          xml.code payment_code
+          xml.date payment_date
+        end
+      end
+
+      builder.to_xml
     end
 
     private

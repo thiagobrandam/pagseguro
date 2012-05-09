@@ -98,6 +98,41 @@ module PagSeguro
     def add(options)
       self << options
     end
+
+    def to_params
+      # Add required params
+      params = {
+        :email => self.email || PagSeguro.config['email'],
+        :token => self.token || PagSeguro.config['authenticity_token'],
+        :currency => 'BRL',
+        :reference => self.reference
+      }
+
+      # Add opitional params
+      params[:shippingType] = self.shipping_type if self.shipping_type
+      params[:redirectURL] = self.redirect_url if self.redirect_url
+      params[:extraAmount] = '%.2f' % self.extra_amount if self.extra_amount
+      params[:maxUses] = self.max_uses if self.max_uses
+      params[:maxAge] = self.max_age if self.max_age
+
+      # Add products
+      self.products.each_with_index do |product, i|
+        i += 1
+        params["itemId#{i}"] = product[:id]
+        params["itemDescription#{i}"] = product[:description]
+        params["itemAmount#{i}"] = '%.2f' % product[:amount]
+        params["itemQuantity#{i}"] = product[:quantity]
+        params["itemShippingCost#{i}"] = '%.2f' % product[:shipping] if product[:shipping]
+        params["itemWeight#{i}"] = product[:weight] if product[:weight]
+      end
+
+      # Add billing info
+      self.billing.each do |name, value|
+        params[PagSeguro::Order::BILLING_MAPPING[name.to_sym]] = value
+      end
+
+      params
+    end
   end
 end
 

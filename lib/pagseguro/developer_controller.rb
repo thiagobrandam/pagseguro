@@ -1,4 +1,4 @@
-# -*- encoding : utf-8 -*-
+#encoding : utf-8
 
 module PagSeguro
   class DeveloperController < ::ActionController::Base
@@ -30,15 +30,13 @@ module PagSeguro
 
       # create the xml response
       builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
-        xml.checkout {
+        xml.checkout do
           xml.code payment_code
           xml.date payment_date
-        }
+        end
       end
-      respond_to do |format|
-        format.html { payment }
-        format.xml { render :xml => builder and return }
-      end
+
+      render :xml => builder and return
     end
 
     def payment
