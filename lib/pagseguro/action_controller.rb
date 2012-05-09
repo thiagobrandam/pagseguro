@@ -30,7 +30,7 @@ module PagSeguro
       post_options = { :body => order.to_params, :headers => header }
 
       response = if PagSeguro.developer?
-        PagSeguro::Faker.checkout_xml
+        PagSeguro::Faker.checkout_params
       else
         HTTParty.post(PagSeguro.gateway_url, post_options).parsed_response
       end

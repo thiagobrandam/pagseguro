@@ -160,18 +160,11 @@ module PagSeguro
       STATES.sample
     end
 
-    def checkout_xml
+    def checkout_params
       payment_code = Digest::MD5.hexdigest(Time.now.to_s)
       payment_date = DateTime.now.to_s
 
-      builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
-        xml.checkout do
-          xml.code payment_code
-          xml.date payment_date
-        end
-      end
-
-      builder.to_xml
+      {:checkout => {:code => payment_code, :date => payment_date}}
     end
 
     private
