@@ -167,6 +167,13 @@ module PagSeguro
       {:checkout => {:code => payment_code, :date => payment_date}}
     end
 
+    def notification_params(params = {})
+      item_id = params['id'] || 1
+      name = params['name'] || self.name
+      email = params['email'] || self.email
+      {:transaction=>{:date=>"2011-02-10T16:13:41.000-03:00", :code=>"9E884542-81B3-4419-9A75-BCC6FB495EF1", :reference=>"REF1234", :type=>"1", :status=>"3", :payment_method=>{:type=>"1", :code=>"101"}, :gross_amount=>"49900.00", :discount_amount=>"0.00", :fee_amount=>"0.00", :net_amount=>"49900.00", :extra_amount=>"0.00", :installment_count=>"1", :item_count=>"2", :items=>{:item=>[{:id=>"1", :description=>"Notebook Prata", :quantity=>"1", :amount=>"24300.00"}]}, :sender=>{:name=>"José Comprador", :email=>"comprador@uol.com.br", :phone=>{:area_code=>"11", :number=>"56273440"}}, :shipping=>{:address=>{:street=>"Av. Brig. Faria Lima", :number=>"1384", :complement=>"5o andar", :district=>"Jardim Paulistano", :postal_code=>"01452002", :city=>"Sao Paulo", :state=>"SP", :country=>"BRA"}, :type=>"1", :cost=>"21.50"}}}
+    end
+
     private
     def normalize(str)
       str = ActiveSupport::Multibyte::Chars.new(str.dup)

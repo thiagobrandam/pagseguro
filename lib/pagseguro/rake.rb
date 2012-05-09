@@ -111,7 +111,7 @@ module PagSeguro
 
       # Finally, ping the configured return URL
       uri = URI.parse File.join(PagSeguro.config["base"], PagSeguro.config["return_to"])
-      Net::HTTP.post_form uri, order
+      Net::HTTP.post_form uri, {'notificationCode' => '1234567890'}
     end
   end
 end

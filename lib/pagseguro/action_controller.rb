@@ -6,11 +6,15 @@ module PagSeguro
       query = { :email => options[:email] || PagSeguro.config['email'],
                 :token => options[:token] || PagSeguro.config['authenticity_token'] }
 
-      response = HTTParty.get(
-                   pagseguro_notification_path(params['notificationCode']),
-                   { :query => query }).
-                 parsed_response.
-                 recursive_symbolize_underscorize_keys!
+      response = if PagSeguro.developer?
+        PagSeguro::Faker.notification_params
+      else
+        HTTParty.get(
+                     pagseguro_notification_path(params['notificationCode']),
+                     { :query => query }).
+                   parsed_response.
+                   recursive_symbolize_underscorize_keys!
+      end
 
       notification = PagSeguro::Notification.new(response[:transaction])
       yield notification
