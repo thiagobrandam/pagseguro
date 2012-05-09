@@ -35,7 +35,10 @@ module PagSeguro
           xml.date payment_date
         }
       end
-      render :xml => builder and return
+      respond_to do |format|
+        format.html { payment }
+        format.xml { render :xml => builder and return }
+      end
     end
 
     def payment
