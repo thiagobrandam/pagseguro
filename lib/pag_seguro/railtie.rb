@@ -1,7 +1,7 @@
 module PagSeguro
   class Railtie < Rails::Railtie
     generators do
-      require "pagseguro/generator"
+      require "pag_seguro/generator"
     end
 
     initializer :add_routing_paths do |app|
@@ -11,16 +11,16 @@ module PagSeguro
     end
 
     rake_tasks do
-      load File.dirname(__FILE__) + "/../tasks/pagseguro.rake"
+      load File.dirname(__FILE__) + "/../tasks/pag_seguro.rake"
     end
 
-    initializer "pagseguro.initialize" do |app|
+    initializer "pag_seguro.initialize" do |app|
       ::ActionView::Base.send(:include, PagSeguro::Helper)
       ::ActionController::Base.send(:include, PagSeguro::ActionController)
     end
 
     config.after_initialize do
-      require "pagseguro/developer_controller" if PagSeguro.developer?
+      require "pag_seguro/developer_controller" if PagSeguro.developer?
     end
   end
 end

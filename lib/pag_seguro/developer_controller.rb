@@ -1,5 +1,4 @@
 #encoding : utf-8
-
 module PagSeguro
   class DeveloperController < ::ActionController::Base
     skip_before_filter :verify_authenticity_token

@@ -1,15 +1,15 @@
-# -*- encoding: utf-8 -*-
+# encoding: utf-8
 $:.push File.expand_path("../lib", __FILE__)
-require "pagseguro/version"
+require "pag_seguro/version"
 
 Gem::Specification.new do |s|
-  s.name        = "pagseguro"
+  s.name        = "pag_seguro"
   s.version     = PagSeguro::Version::STRING
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Nando Vieira"]
-  s.email       = ["fnando.vieira@gmail.com"]
+  s.authors     = ["Thiago Brandão Damasceno"]
+  s.email       = ["thiago@redealumni.com"]
   s.homepage    = "http://rubygems.org/gems/pagseguro"
-  s.summary     = "The official PagSeguro library"
+  s.summary     = "A fork of the official PagSeguro library"
   s.description = s.summary
 
   s.files         = `git ls-files`.split("\n")
