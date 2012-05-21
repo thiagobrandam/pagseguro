@@ -123,7 +123,7 @@ module PagSeguro
       if developer?
         PagSeguro.config['base'] + '/pagseguro_developer/notification'
       else
-        PagSeguro.config['gateway_notification_url'] + GATEWAY_NOTIFICATION_URL
+        PagSeguro.config['gateway_notification_url'] || GATEWAY_NOTIFICATION_URL
       end
     end
 
