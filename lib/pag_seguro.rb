@@ -103,7 +103,7 @@ module PagSeguro
       if developer?
         PagSeguro.config['base'] + '/pagseguro_developer'
       else
-        GATEWAY_URL
+        PagSeguro.config['gateway_url'] || GATEWAY_URL
       end
     end
 
@@ -113,7 +113,7 @@ module PagSeguro
       if developer?
         PagSeguro.config['base'] + '/pagseguro_developer/payment'
       else
-        GATEWAY_PAYMENT_URL
+        PagSeguro.config['gateway_payment_url'] || GATEWAY_PAYMENT_URL
       end
     end
 
@@ -123,7 +123,7 @@ module PagSeguro
       if developer?
         PagSeguro.config['base'] + '/pagseguro_developer/notification'
       else
-        GATEWAY_NOTIFICATION_URL
+        PagSeguro.config['gateway_notification_url'] + GATEWAY_NOTIFICATION_URL
       end
     end
 
