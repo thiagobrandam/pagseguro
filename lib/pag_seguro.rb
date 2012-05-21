@@ -72,7 +72,7 @@ module PagSeguro
   class << self
     # The path to the configuration file
     def config_file
-      Rails.root.join("config/pagseguro.yml")
+      Rails.root.join('config/pagseguro.yml')
     end
 
     # Check if configuration file exists.
