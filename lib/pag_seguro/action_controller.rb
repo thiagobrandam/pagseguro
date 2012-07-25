@@ -1,6 +1,6 @@
 module PagSeguro
   module ActionController
-    private
+
     def pagseguro_notification(options={}, &block)
       return unless request.post?
       query = { :email => options[:email] || PagSeguro.config['email'],
@@ -53,4 +53,3 @@ module PagSeguro
     end
   end
 end
-
