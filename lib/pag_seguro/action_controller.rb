@@ -22,6 +22,18 @@ module PagSeguro
         end
 
         notification = PagSeguro::Notification.new(response[:transaction])
+      elsif params['TransacaoID']
+        response = if PagSeguro.developer?
+          PagSeguro::Faker.notification_params
+        else
+          HTTParty.get(
+                       pagseguro_transaction_path(params['TransacaoID']),
+                       { :query => query }).
+                     parsed_response.
+                     recursive_symbolize_underscorize_keys!
+        end
+
+        notification = PagSeguro::Notification.new(response[:transaction])
       else
         notification.instance_variable_set('@products',[])
       end
@@ -30,6 +42,10 @@ module PagSeguro
 
     def pagseguro_notification_path(code)
       PagSeguro.gateway_notification_url + "/#{code}"
+    end
+
+    def pagseguro_transaction_path(transaction_id)
+      PagSeguro.gateway_transaction_url + "/#{transaction_id}"
     end
 
     def pagseguro_payment_path(code)

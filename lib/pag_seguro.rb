@@ -10,6 +10,7 @@ module PagSeguro
   GATEWAY_URL = "https://ws.pagseguro.uol.com.br/v2/checkout"
   GATEWAY_PAYMENT_URL = "https://pagseguro.uol.com.br/v2/checkout/payment.html"
   GATEWAY_NOTIFICATION_URL = "https://ws.pagseguro.uol.com.br/v2/transactions/notifications"
+  GATEWAY_TRANSACTION_URL = 'https://ws.pagseguro.uol.com.br/v2/transactions'
 
   STATUS = {
     :pending => 'Aguardando pagamento',
@@ -124,6 +125,14 @@ module PagSeguro
         PagSeguro.config['base'] + '/pagseguro_developer/notification'
       else
         PagSeguro.config['gateway_notification_url'] || GATEWAY_NOTIFICATION_URL
+      end
+    end
+
+    def gateway_transaction_url
+      if developer?
+        PagSeguro.config['base'] + '/pagseguro_developer/notification'
+      else
+        PagSeguro.config['gateway_transaction_url'] || GATEWAY_TRANSACTION_URL
       end
     end
 
