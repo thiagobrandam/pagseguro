@@ -17,6 +17,8 @@ module PagSeguro
       end
 
       if defined?(Rails)
+        Rails.logger.warn(query.inspect)
+        Rails.logger.warn(params.inspect)
         Rails.logger.warn(response.inspect)
       end
 
