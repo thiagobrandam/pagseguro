@@ -6,23 +6,25 @@ module PagSeguro
       query = { :email => options[:email] || PagSeguro.config['email'],
                 :token => options[:token] || PagSeguro.config['authenticity_token'] }
 
-      response = if PagSeguro.developer?
-        PagSeguro::Faker.notification_params
+
+      # null notification
+      notification = PagSeguro::Notification.new({:transaction => {:items => []}})
+
+      if params['notificationCode']
+        response = if PagSeguro.developer?
+          PagSeguro::Faker.notification_params
+        else
+          HTTParty.get(
+                       pagseguro_notification_path(params['notificationCode']),
+                       { :query => query }).
+                     parsed_response.
+                     recursive_symbolize_underscorize_keys!
+        end
+
+        notification = PagSeguro::Notification.new(response[:transaction])
       else
-        HTTParty.get(
-                     pagseguro_notification_path(params['notificationCode']),
-                     { :query => query }).
-                   parsed_response.
-                   recursive_symbolize_underscorize_keys!
+        notification.instance_variable_set('@products',[])
       end
-
-      if defined?(Rails)
-        Rails.logger.warn(query.inspect)
-        Rails.logger.warn(params.inspect)
-        Rails.logger.warn(response.inspect)
-      end
-
-      notification = PagSeguro::Notification.new(response[:transaction])
       yield notification
     end
 
