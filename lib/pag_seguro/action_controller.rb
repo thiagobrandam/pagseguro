@@ -16,6 +16,10 @@ module PagSeguro
                    recursive_symbolize_underscorize_keys!
       end
 
+      if defined?(Rails)
+        Rails.logger.warn(response.inspect)
+      end
+
       notification = PagSeguro::Notification.new(response[:transaction])
       yield notification
     end
